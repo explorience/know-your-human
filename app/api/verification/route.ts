@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
-import { registerAttestation, VERIFICATION_LEVELS, checkOdisQuota } from "@/lib/self-protocol";
+import {
+  registerAttestation,
+  VERIFICATION_LEVELS,
+  checkOdisQuota,
+} from "@/lib/self-protocol";
+import {
+  createVerificationSession,
+  isSelfConfigured,
+} from "@/lib/self-protocol-v2";
+import { generate402Header, verifyPayment, PAYMENT_TIERS } from "@/lib/x402";
 import type { Address } from "viem";
 
 // In-memory store for verification requests (use Redis in production)
-const verificationRequests = new Map<
+export const verificationRequests = new Map<
   string,
   {
     id: string;
@@ -14,6 +23,8 @@ const verificationRequests = new Map<
     status: "pending" | "completed" | "failed";
     verificationId?: string;
     attestationHash?: string;
+    selfSessionId?: string;
+    paymentTxHash?: string;
     createdAt: string;
     expiresAt: string;
   }
@@ -22,7 +33,13 @@ const verificationRequests = new Map<
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { agentAddress, userAddress, level = "basic" } = body;
+    const {
+      agentAddress,
+      userAddress,
+      level = "basic",
+      paymentHeader,
+      skipPayment,
+    } = body;
 
     // Validate inputs
     if (!agentAddress || !userAddress) {
@@ -35,80 +52,143 @@ export async function POST(request: NextRequest) {
     const verificationLevel = VERIFICATION_LEVELS[level];
     if (!verificationLevel) {
       return NextResponse.json(
-        { error: "Invalid verification level. Use: basic, standard, or enhanced" },
+        {
+          error:
+            "Invalid verification level. Use: basic, standard, or enhanced",
+        },
         { status: 400 }
       );
     }
 
-    // Skip ODIS check in demo mode (no issuer key)
+    const tier = PAYMENT_TIERS[level];
+
+    // x402 Payment gate
+    // If no payment header and not skipping payment, return 402
+    if (!paymentHeader && !skipPayment) {
+      const resource = `${process.env.NEXT_PUBLIC_GATEWAY_URL || "http://localhost:3000"}/api/verification`;
+      const paymentRequirements = generate402Header(
+        level as "basic" | "standard" | "enhanced",
+        resource
+      );
+
+      return NextResponse.json(
+        {
+          error: "Payment Required",
+          paymentRequired: {
+            amount: tier.priceCUSD,
+            currency: "cUSD",
+            network: "celo-alfajores",
+            paymentRequirements,
+            tier: tier.level,
+            description: tier.description,
+          },
+        },
+        {
+          status: 402,
+          headers: {
+            "X-Payment-Required": paymentRequirements,
+          },
+        }
+      );
+    }
+
+    // Verify payment if provided
+    let paymentReceipt = null;
+    if (paymentHeader) {
+      const paymentResult = await verifyPayment(
+        paymentHeader,
+        tier.priceCUSD,
+        level as "basic" | "standard" | "enhanced"
+      );
+      if (!paymentResult.success) {
+        return NextResponse.json(
+          { error: `Payment verification failed: ${paymentResult.error}` },
+          { status: 402 }
+        );
+      }
+      paymentReceipt = paymentResult.receipt;
+    }
+
+    // Check ODIS quota in demo mode
     const hasIssuerKey = process.env.ISSUER_PRIVATE_KEY;
     if (hasIssuerKey) {
-      // Check ODIS quota
-      const quota = await checkOdisQuota();
-      console.log(`ODIS Quota available: ${quota}`);
+      try {
+        const quota = await checkOdisQuota();
+        console.log(`ODIS Quota available: ${quota}`);
+      } catch (err) {
+        console.warn("ODIS quota check failed (continuing):", err);
+      }
     } else {
-      console.log(`Demo mode: Skipping ODIS quota check`);
+      console.log("Demo mode: Skipping ODIS quota check");
     }
 
     // Create verification request
     const verificationId = uuidv4();
-    const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString(); // 30 min
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
 
-    const requestData: {
-    id: string;
-    agentAddress: string;
-    userAddress: string;
-    level: string;
-    status: "pending" | "completed" | "failed";
-    verificationId?: string;
-    attestationHash?: string;
-    createdAt: string;
-    expiresAt: string;
-  } = {
+    const requestData = {
       id: verificationId,
       agentAddress: agentAddress.toLowerCase(),
       userAddress: userAddress.toLowerCase(),
       level,
-      status: "pending",
+      status: "pending" as const,
+      paymentTxHash: paymentReceipt?.txHash,
       createdAt: new Date().toISOString(),
       expiresAt,
     };
 
     verificationRequests.set(verificationId, requestData);
 
-    // For demo purposes without wallet, just mark as completed
-    // In production, this would redirect to Self Protocol widget
-    
+    // Create Self Protocol verification session
+    const selfSession = await createVerificationSession(
+      userAddress,
+      level as "basic" | "standard" | "enhanced"
+    );
+
+    // Store the Self session ID for webhook callbacks
+    const storedRequest = verificationRequests.get(verificationId)!;
+    storedRequest.selfSessionId = selfSession.sessionId;
+
+    // On-chain attestation via ODIS/FederatedAttestations
     if (hasIssuerKey) {
       try {
-        // Attempt to register attestation
         const result = await registerAttestation(
-          `+1555${userAddress.slice(-7)}`, // Demo: construct phone from address
+          `+1555${userAddress.slice(-7)}`,
           userAddress as Address
         );
-
-        requestData.status = "completed";
-        requestData.attestationHash = result.transactionHash;
-
-        console.log(`Verification completed for ${userAddress}:`, result.transactionHash);
+        storedRequest.status = "completed";
+        storedRequest.attestationHash = result.transactionHash;
+        console.log(
+          `Verification completed for ${userAddress}:`,
+          result.transactionHash
+        );
       } catch (error) {
-        console.error("Verification registration failed:", error);
-        // Don't fail the request - let user retry
-        requestData.status = "pending";
+        console.error("Attestation registration failed:", error);
+        storedRequest.status = "pending";
       }
     } else {
-      // Demo mode - simulate successful verification
-      requestData.status = "completed";
-      requestData.attestationHash = "0xdemo" + Math.random().toString(16).slice(2, 10);
+      // Demo mode
+      storedRequest.status = "completed";
+      storedRequest.attestationHash =
+        "0xdemo" + Math.random().toString(16).slice(2, 10);
       console.log(`Demo mode: Verification simulated for ${userAddress}`);
     }
 
+    const demoMode = !hasIssuerKey && !isSelfConfigured();
+
     return NextResponse.json({
       verificationId,
-      status: requestData.status,
+      status: storedRequest.status,
       level,
       expiresAt,
-      message: "Verification initiated. Complete verification via Self Protocol app.",
+      selfVerificationUrl: selfSession.verificationUrl,
+      selfQrData: selfSession.qrData,
+      attestationHash: storedRequest.attestationHash,
+      paymentReceipt,
+      demoMode,
+      message: demoMode
+        ? "Demo mode: verification simulated"
+        : "Verification initiated. Complete via Self Protocol app.",
     });
   } catch (error) {
     console.error("Verification request error:", error);
@@ -138,6 +218,7 @@ export async function GET(request: NextRequest) {
       status: requestData.status,
       level: requestData.level,
       attestationHash: requestData.attestationHash,
+      paymentTxHash: requestData.paymentTxHash,
       createdAt: requestData.createdAt,
       expiresAt: requestData.expiresAt,
     });
@@ -147,7 +228,10 @@ export async function GET(request: NextRequest) {
     // Find all verifications for a user
     const userVerifications = Array.from(verificationRequests.values())
       .filter((r) => r.userAddress === userAddress.toLowerCase())
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
 
     const latest = userVerifications[0];
     if (!latest) {
@@ -159,11 +243,26 @@ export async function GET(request: NextRequest) {
       level: latest.level,
       attestationHash: latest.attestationHash,
       issuedAt: latest.createdAt,
+      history: userVerifications.slice(0, 10).map((v) => ({
+        verificationId: v.id,
+        level: v.level,
+        status: v.status,
+        attestationHash: v.attestationHash,
+        createdAt: v.createdAt,
+      })),
     });
   }
 
-  return NextResponse.json(
-    { error: "Provide verificationId or userAddress" },
-    { status: 400 }
-  );
+  // Return stats
+  const all = Array.from(verificationRequests.values());
+  return NextResponse.json({
+    totalVerifications: all.length,
+    completed: all.filter((v) => v.status === "completed").length,
+    pending: all.filter((v) => v.status === "pending").length,
+    byLevel: {
+      basic: all.filter((v) => v.level === "basic").length,
+      standard: all.filter((v) => v.level === "standard").length,
+      enhanced: all.filter((v) => v.level === "enhanced").length,
+    },
+  });
 }
