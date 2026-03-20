@@ -12,6 +12,11 @@ import {
 import { generate402Header, verifyPayment, PAYMENT_TIERS } from "@/lib/x402";
 import { isRegisteredAgent } from "@/lib/erc8004";
 import { checkRateLimit, getRetryAfter } from "@/lib/rate-limiter";
+import {
+  executeVerification,
+  getVerificationPlan,
+  type MultiProviderResult,
+} from "@/lib/providers";
 import type { Address } from "viem";
 
 // In-memory store for verification requests (use Redis in production)
@@ -28,6 +33,7 @@ export const verificationRequests = new Map<
     attestationHash?: string;
     selfSessionId?: string;
     paymentTxHash?: string;
+    providerResults?: MultiProviderResult;
     createdAt: string;
     expiresAt: string;
   }
@@ -195,8 +201,15 @@ export async function POST(request: NextRequest) {
     const storedRequest = verificationRequests.get(verificationId)!;
     storedRequest.selfSessionId = selfSession.sessionId;
 
+    // Multi-provider verification
+    const multiProviderResult = await executeVerification(
+      level as "basic" | "standard" | "enhanced",
+      { userAddress, agentAddress, agentId: requestData.agentId }
+    );
+    storedRequest.providerResults = multiProviderResult;
+
     // On-chain attestation via ODIS/FederatedAttestations
-    if (hasIssuerKey) {
+    if (hasIssuerKey && multiProviderResult.overallSuccess) {
       try {
         const result = await registerAttestation(
           `+1555${userAddress.slice(-7)}`,
@@ -210,17 +223,21 @@ export async function POST(request: NextRequest) {
         );
       } catch (error) {
         console.error("Attestation registration failed:", error);
-        storedRequest.status = "pending";
+        storedRequest.status = multiProviderResult.overallSuccess ? "completed" : "pending";
       }
-    } else {
+    } else if (multiProviderResult.overallSuccess) {
       // Demo mode
       storedRequest.status = "completed";
       storedRequest.attestationHash =
         "0xdemo" + Math.random().toString(16).slice(2, 10);
       console.log(`Demo mode: Verification simulated for ${userAddress}`);
+    } else {
+      storedRequest.status = "failed";
     }
 
-    const demoMode = !hasIssuerKey && !isSelfConfigured();
+    const demoMode = multiProviderResult.demoMode;
+
+    const verificationPlan = getVerificationPlan(level as "basic" | "standard" | "enhanced");
 
     const response = NextResponse.json({
       verificationId,
@@ -232,10 +249,29 @@ export async function POST(request: NextRequest) {
       selfQrData: selfSession.qrData,
       attestationHash: storedRequest.attestationHash,
       paymentReceipt,
+      verificationPlan: {
+        providers: verificationPlan.providers,
+        checks: verificationPlan.checks,
+        estimatedCostUSD: verificationPlan.estimatedCostUSD,
+      },
+      providerResults: {
+        overallSuccess: multiProviderResult.overallSuccess,
+        totalChecks: multiProviderResult.totalChecks,
+        passedChecks: multiProviderResult.passedChecks,
+        durationMs: multiProviderResult.durationMs,
+        providers: multiProviderResult.providerResults.map((pr) => ({
+          provider: pr.provider,
+          success: pr.success,
+          checks: pr.checks,
+          score: pr.score,
+          demoMode: pr.demoMode,
+          durationMs: pr.durationMs,
+        })),
+      },
       demoMode,
       message: demoMode
-        ? "Demo mode: verification simulated"
-        : "Verification initiated. Complete via Self Protocol app.",
+        ? "Demo mode: multi-provider verification simulated"
+        : "Verification complete via Self Protocol + Didit + Human Passport.",
     });
 
     // Add rate limit headers
