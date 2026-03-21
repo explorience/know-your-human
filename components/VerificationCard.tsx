@@ -1,5 +1,5 @@
 interface VerificationCardProps {
-  tier: "basic" | "standard" | "enhanced";
+  tier: "starter" | "basic" | "standard" | "enhanced";
   price: string;
   features: string[];
   highlighted?: boolean;
@@ -7,14 +7,27 @@ interface VerificationCardProps {
 }
 
 const tierConfig = {
+  starter: {
+    name: "Starter",
+    icon: "📱",
+    color: "text-purple-400",
+    borderColor: "border-purple-500/30",
+    bgColor: "bg-purple-500/5",
+    badgeColor: "badge-blue",
+    description: "Phone + social proof — no documents",
+    validity: "7-day credential",
+    providers: "Phone · Social Stamps",
+  },
   basic: {
     name: "Basic",
-    icon: "🔍",
+    icon: "🔐",
     color: "text-blue-400",
     borderColor: "border-blue-500/30",
     bgColor: "bg-blue-500/5",
     badgeColor: "badge-blue",
-    description: "Phone number verification",
+    description: "ZK passport proof via Self Protocol",
+    validity: "30-day credential",
+    providers: "Self Protocol",
   },
   standard: {
     name: "Standard",
@@ -23,7 +36,9 @@ const tierConfig = {
     borderColor: "border-[#35D07F]/30",
     bgColor: "bg-[#35D07F]/5",
     badgeColor: "badge-green",
-    description: "Government ID verification",
+    description: "Gov ID + liveness via ZK proofs",
+    validity: "60-day credential",
+    providers: "Human Passport",
   },
   enhanced: {
     name: "Enhanced",
@@ -32,7 +47,9 @@ const tierConfig = {
     borderColor: "border-[#FCFF52]/30",
     bgColor: "bg-[#FCFF52]/5",
     badgeColor: "badge-yellow",
-    description: "Biometric + sanctions check",
+    description: "ZK passport + biometric KYC + AML",
+    validity: "90-day credential",
+    providers: "Self · Didit · Human Passport",
   },
 };
 
@@ -62,7 +79,7 @@ export default function VerificationCard({
       )}
 
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex items-start justify-between mb-3">
         <div>
           <div className="text-2xl mb-1">{config.icon}</div>
           <h3 className={`text-lg font-bold ${config.color}`}>{config.name}</h3>
@@ -70,8 +87,15 @@ export default function VerificationCard({
         </div>
         <div className="text-right">
           <div className="text-2xl font-black text-white">{price}</div>
-          <div className="text-xs text-gray-500">cUSD per request</div>
+          <div className="text-xs text-gray-500">cUSD per check</div>
         </div>
+      </div>
+
+      {/* Providers + validity */}
+      <div className="flex items-center gap-2 mb-4 flex-wrap">
+        <span className="text-xs text-gray-500 font-mono">{config.providers}</span>
+        <span className="text-gray-700">·</span>
+        <span className={`text-xs font-mono ${config.color} opacity-70`}>{config.validity}</span>
       </div>
 
       {/* Features */}

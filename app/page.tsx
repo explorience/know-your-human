@@ -7,26 +7,26 @@ import VerificationCard from "@/components/VerificationCard";
 const howItWorks = [
   {
     step: "01",
-    title: "Agent Requests Verification",
-    desc: "An AI agent calls the KYC Gateway API with user address and desired verification level. Payment is made automatically via x402 protocol.",
+    title: "Agent or dApp Requests Verification",
+    desc: "An AI agent or dApp calls the KYH API with a wallet address and desired tier. Payment is made automatically via x402 — as little as $0.001 cUSD.",
     icon: "🤖",
   },
   {
     step: "02",
-    title: "x402 Micropayment",
-    desc: "The gateway issues a 402 Payment Required response. The agent pays in cUSD on Celo — as low as $0.25 per verification.",
+    title: "x402 Micropayment in cUSD",
+    desc: "The gateway issues a 402 Payment Required response. The agent pays automatically in cUSD on Celo. No invoices, no contracts, no minimums.",
     icon: "💳",
   },
   {
     step: "03",
-    title: "User Scans Passport",
-    desc: "User receives a verification link and scans their passport NFC chip with the Self Protocol app. All processing happens locally.",
+    title: "Human Verifies Once",
+    desc: "The human receives a verification link. Depending on tier: tap passport NFC chip, complete a liveness check, or simply confirm their phone number. Takes 5–120 seconds.",
     icon: "📱",
   },
   {
     step: "04",
-    title: "ZK Proof → On-Chain Attestation",
-    desc: "Self Protocol generates a ZK-SNARK proof. The gateway verifies it and registers an attestation on Celo — no PII stored anywhere.",
+    title: "EAS Credential Issued on Celo",
+    desc: "KYH issues an EAS attestation to the human's wallet — valid for 7–90 days. Any agent or dApp can now check that credential instantly, for free, via a single contract call.",
     icon: "⛓️",
   },
 ];
@@ -34,10 +34,35 @@ const howItWorks = [
 const techBadges = [
   { label: "Celo", color: "badge-green", icon: "🟡" },
   { label: "Self Protocol", color: "badge-blue", icon: "🔐" },
+  { label: "Human Passport", color: "badge-green", icon: "🛂" },
+  { label: "Didit", color: "badge-blue", icon: "🪪" },
   { label: "x402", color: "badge-yellow", icon: "💸" },
   { label: "ZK-SNARKs", color: "badge-green", icon: "⚡" },
-  { label: "FederatedAttestations", color: "badge-blue", icon: "📜" },
+  { label: "EAS", color: "badge-blue", icon: "📜" },
   { label: "ERC-8004", color: "badge-yellow", icon: "🤖" },
+];
+
+const useCases = [
+  {
+    icon: "💸",
+    title: "Cross-Border Remittance",
+    desc: "Agent sends cUSD internationally. Remittance dApp requires sender identity. KYH verifies once — all future transfers clear instantly.",
+  },
+  {
+    icon: "🏦",
+    title: "Micro-Lending",
+    desc: "Lending protocol needs proof of unique humanity before issuing a loan. Starter tier works without a passport — phone + social proof is enough.",
+  },
+  {
+    icon: "🗳️",
+    title: "Governance & Quadratic Funding",
+    desc: "DAO voting or Gitcoin-style rounds need one-person-one-vote guarantees. KYH Basic or Standard provides sybil-resistant proof of personhood.",
+  },
+  {
+    icon: "🔒",
+    title: "Regulated DeFi Pools",
+    desc: "Some liquidity pools require KYC for AML compliance. Enhanced tier provides full biometric + sanctions screening with a 90-day reusable credential.",
+  },
 ];
 
 export default function LandingPage() {
@@ -47,7 +72,6 @@ export default function LandingPage() {
 
       {/* Hero section */}
       <section className="pt-32 pb-20 px-4 relative overflow-hidden">
-        {/* Background gradient blobs */}
         <div
           className="absolute top-20 left-1/4 w-96 h-96 rounded-full opacity-10 blur-3xl pointer-events-none"
           style={{
@@ -62,7 +86,6 @@ export default function LandingPage() {
         />
 
         <div className="max-w-5xl mx-auto text-center relative z-10">
-          {/* Badge */}
           <div className="flex items-center justify-center gap-2 mb-6">
             <span className="badge badge-green text-xs">
               🏆 Celo Hackathon 2026
@@ -73,16 +96,22 @@ export default function LandingPage() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-6 leading-tight tracking-tight">
-            Privacy-Preserving
+            Know Your Human
             <br />
-            <span className="gradient-text">KYC for AI Agents</span>
+            <span className="gradient-text">KYC for the Celo Ecosystem</span>
           </h1>
 
-          <p className="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto mb-10 leading-relaxed">
-            The first identity verification gateway built for the agentic web.
-            AI agents pay $0.25 cUSD via <strong className="text-white">x402</strong>,
-            users verify with <strong className="text-white">Self Protocol</strong> ZK proofs,
-            attestations land on <strong className="text-[#35D07F]">Celo</strong> — zero PII stored.
+          <p className="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto mb-4 leading-relaxed">
+            The first identity verification API built for AI agents and dApps on Celo.
+            Verify once. Credential lives on-chain.{" "}
+            <strong className="text-white">Anyone checks it for free.</strong>
+          </p>
+          <p className="text-base text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+            From <strong className="text-gray-300">$0.001</strong> (phone + social, no documents) to{" "}
+            <strong className="text-gray-300">$0.75</strong> (full biometric KYC + AML).
+            Payments via <strong className="text-white">x402</strong>.
+            Credentials via <strong className="text-white">EAS on Celo</strong>.
+            Zero PII stored.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
@@ -94,7 +123,6 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Architecture diagram */}
           <div className="glass-card rounded-2xl p-6 sm:p-8 max-w-4xl mx-auto">
             <p className="text-xs text-gray-500 uppercase tracking-widest mb-4 text-center font-semibold">
               Verification Flow
@@ -106,55 +134,78 @@ export default function LandingPage() {
 
       {/* Pricing tiers */}
       <section className="py-20 px-4" id="pricing">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
-              Simple, Transparent{" "}
-              <span className="gradient-text">Pricing</span>
+              Four Tiers.{" "}
+              <span className="gradient-text">One API.</span>
             </h2>
             <p className="text-gray-400 max-w-lg mx-auto">
-              Pay per verification in cUSD on Celo. No subscriptions, no
-              minimums. AI agents pay automatically via x402.
+              Pay per verification in cUSD on Celo. No subscriptions, no minimums.
+              Agents pay automatically via x402. Credentials reusable for 7–90 days.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <VerificationCard
+              tier="starter"
+              price="$0.001"
+              features={[
+                "No passport required",
+                "Phone number uniqueness",
+                "Social presence proof",
+                "Built for the unbanked",
+                "EAS credential on Celo",
+                "7-day validity",
+              ]}
+            />
             <VerificationCard
               tier="basic"
-              price="$0.25"
+              price="$0.01"
               features={[
-                "Phone number verification",
-                "Humanity proof",
-                "Basic KYC compliance",
-                "On-chain attestation",
-                "< 5 min verification",
+                "NFC passport chip scan",
+                "ZK-SNARK proof",
+                "Humanity + age verified",
+                "No biometrics needed",
+                "EAS credential on Celo",
+                "30-day validity",
               ]}
             />
             <VerificationCard
               tier="standard"
-              price="$1.50"
+              price="$0.25"
               features={[
-                "Government ID document",
-                "Nationality check",
-                "Age 18+ verification",
-                "ZK proof (no PII stored)",
-                "FederatedAttestation on Celo",
-                "< 10 min verification",
+                "Gov ID document scan",
+                "Liveness check",
+                "Face match verification",
+                "ZK proof — no PII stored",
+                "EAS credential on Celo",
+                "60-day validity",
               ]}
               highlighted={true}
             />
             <VerificationCard
               tier="enhanced"
-              price="$5.00"
+              price="$0.75"
               features={[
-                "Biometric verification",
-                "Sanctions list screening",
-                "Full AML compliance",
-                "Passport NFC scan",
-                "Highest trust level",
-                "Priority processing",
+                "ZK passport + biometrics",
+                "Full AML screening",
+                "Sanctions list check",
+                "Multi-provider assurance",
+                "EAS credential on Celo",
+                "90-day validity",
               ]}
             />
+          </div>
+
+          {/* Sponsor economics callout */}
+          <div className="mt-10 rounded-2xl p-6 border border-[#35D07F]/20 bg-[#35D07F]/5 max-w-3xl mx-auto text-center">
+            <p className="text-sm text-[#35D07F] font-semibold mb-1">💡 Sponsor Economics</p>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              The first agent to verify a human earns back up to <strong className="text-white">2× their cost</strong> as
+              subsequent agents pay a small read fee. After that, they earn <strong className="text-white">10% perpetually</strong>.
+              Enforced on-chain by KYHRegistry.sol — no trust required.
+            </p>
           </div>
         </div>
       </section>
@@ -167,7 +218,7 @@ export default function LandingPage() {
               How It <span className="gradient-text">Works</span>
             </h2>
             <p className="text-gray-400 max-w-lg mx-auto">
-              End-to-end privacy-preserving KYC in four steps.
+              Verify once. Reuse forever. Any agent or dApp checks the credential with a single contract call.
             </p>
           </div>
 
@@ -186,13 +237,32 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold mb-2">
-                    {step.title}
-                  </h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">
-                    {step.desc}
-                  </p>
+                  <h3 className="text-white font-semibold mb-2">{step.title}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">{step.desc}</p>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Use cases */}
+      <section className="py-20 px-4" id="use-cases">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
+              Real <span className="gradient-text">Use Cases</span>
+            </h2>
+            <p className="text-gray-400 max-w-lg mx-auto">
+              Anywhere an agent or dApp needs to know: is this wallet a verified human?
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {useCases.map((uc) => (
+              <div key={uc.title} className="glass-card rounded-2xl p-6">
+                <div className="text-3xl mb-3">{uc.icon}</div>
+                <h3 className="text-white font-semibold mb-2">{uc.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{uc.desc}</p>
               </div>
             ))}
           </div>
@@ -228,12 +298,15 @@ export default function LandingPage() {
           >
             <div className="text-5xl mb-6 animate-float">🤖</div>
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
-              Built for the Agentic Web
+              KYC for the Agentic Web
             </h2>
-            <p className="text-gray-300 mb-8 max-w-xl mx-auto leading-relaxed">
+            <p className="text-gray-300 mb-2 max-w-xl mx-auto leading-relaxed">
               As AI agents gain autonomy and handle real-world transactions,
-              identity verification becomes critical infrastructure. KYCGateway
-              makes this seamless, private, and cheap.
+              identity verification becomes critical infrastructure.
+            </p>
+            <p className="text-gray-400 mb-8 max-w-xl mx-auto text-sm leading-relaxed">
+              Know Your Human makes it seamless — one API, four tiers, credentials
+              that travel with your wallet. Agents pay. Humans verify once. Everyone benefits.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/demo" className="btn-primary text-base px-6 py-3">

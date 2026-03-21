@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Agent KYC Gateway — Privacy-Preserving Identity for AI Agents",
+  title: "Know Your Human — KYC for the Celo Ecosystem",
   description:
-    "ZK-SNARK based KYC verification for AI agents on Celo. Powered by Self Protocol and x402 micropayments.",
+    "The first identity verification API for AI agents and dApps on Celo. Verify once, credential lives on-chain, anyone checks it for free.",
   openGraph: {
-    title: "Agent KYC Gateway",
-    description: "Privacy-preserving KYC for AI agents on Celo",
+    title: "Know Your Human",
+    description: "KYC as a service for agents, dApps, and developers on Celo",
     type: "website",
   },
 };

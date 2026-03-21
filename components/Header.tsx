@@ -23,7 +23,7 @@ export default function Header() {
               K
             </div>
             <span className="font-bold text-white text-lg hidden sm:block">
-              KYC<span className="text-[#35D07F]">Gateway</span>
+              Know Your<span className="text-[#35D07F]">Human</span>
             </span>
           </Link>
 
