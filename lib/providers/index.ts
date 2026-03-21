@@ -10,6 +10,7 @@
 import { verifySelf } from "./self";
 import { verifyWithDidit } from "./didit";
 import { verifyWithHumanPassport } from "./human-passport";
+import { verifyWithStarter } from "./starter";
 
 export interface ProviderCheck {
   type:
@@ -21,7 +22,8 @@ export interface ProviderCheck {
     | "sybil-score"
     | "sanctions"
     | "age"
-    | "nationality";
+    | "nationality"
+    | "phone";
   passed: boolean;
   details?: string;
   confidence?: number;
@@ -38,8 +40,8 @@ export interface ProviderResult {
 }
 
 export interface VerificationPlan {
-  level: "basic" | "standard" | "enhanced";
-  providers: Array<"self" | "didit" | "human-passport">;
+  level: "starter" | "basic" | "standard" | "enhanced";
+  providers: Array<"self" | "didit" | "human-passport" | "starter">;
   checks: string[];
   estimatedCostUSD: string;
   estimatedTimeSeconds: number;
@@ -59,30 +61,31 @@ export interface MultiProviderResult {
  * Get the verification plan for a given tier.
  */
 export function getVerificationPlan(
-  level: "basic" | "standard" | "enhanced"
+  level: "starter" | "basic" | "standard" | "enhanced"
 ): VerificationPlan {
   switch (level) {
+    case "starter":
+      return {
+        level,
+        providers: ["starter"],
+        checks: ["phone", "sybil-score"],
+        estimatedCostUSD: "0.001",
+        estimatedTimeSeconds: 2,
+      };
     case "basic":
       return {
         level,
-        providers: ["self", "human-passport"],
-        checks: ["humanity", "age", "sybil-score"],
-        estimatedCostUSD: "0.10",
+        providers: ["self"],
+        checks: ["humanity", "age"],
+        estimatedCostUSD: "0.01",
         estimatedTimeSeconds: 3,
       };
     case "standard":
       return {
         level,
-        providers: ["self", "didit", "human-passport"],
-        checks: [
-          "humanity",
-          "age",
-          "nationality",
-          "document",
-          "face-match",
-          "sybil-score",
-        ],
-        estimatedCostUSD: "1.00",
+        providers: ["human-passport"],
+        checks: ["document", "liveness", "face-match", "humanity"],
+        estimatedCostUSD: "0.25",
         estimatedTimeSeconds: 8,
       };
     case "enhanced":
@@ -100,7 +103,7 @@ export function getVerificationPlan(
           "sanctions",
           "sybil-score",
         ],
-        estimatedCostUSD: "2.50",
+        estimatedCostUSD: "0.75",
         estimatedTimeSeconds: 12,
       };
   }
@@ -110,7 +113,7 @@ export function getVerificationPlan(
  * Execute multi-provider verification for a given tier.
  */
 export async function executeVerification(
-  level: "basic" | "standard" | "enhanced",
+  level: "starter" | "basic" | "standard" | "enhanced",
   userData: {
     userAddress: string;
     agentAddress: string;
@@ -121,22 +124,30 @@ export async function executeVerification(
   const plan = getVerificationPlan(level);
   const results: ProviderResult[] = [];
 
-  // Always run Self Protocol
-  const selfResult = await verifySelf(level, userData.userAddress);
-  results.push(selfResult);
-
-  // Run Didit for Standard and Enhanced tiers
-  if (level === "standard" || level === "enhanced") {
-    const diditResult = await verifyWithDidit(level, userData.userAddress);
-    results.push(diditResult);
+  if (level === "starter") {
+    // Starter: phone + social stamps only, no document required
+    const starterResult = await verifyWithStarter("starter", userData.userAddress);
+    results.push(starterResult);
+  } else if (level === "basic") {
+    // Basic: Self Protocol ZK passport only
+    const selfResult = await verifySelf(level, userData.userAddress);
+    results.push(selfResult);
+  } else if (level === "standard") {
+    // Standard: Human Passport Individual Verifications (Gov ID + liveness + face match)
+    const hpResult = await verifyWithHumanPassport(level, userData.userAddress);
+    results.push(hpResult);
+  } else if (level === "enhanced") {
+    // Enhanced: Self + Didit full KYC + HP Clean Hands
+    const [selfResult, diditResult, hpResult] = await Promise.all([
+      verifySelf(level, userData.userAddress),
+      verifyWithDidit(level, userData.userAddress),
+      verifyWithHumanPassport(level, userData.userAddress),
+    ]);
+    results.push(selfResult, diditResult, hpResult);
   }
 
-  // Always run Human Passport
-  const hpResult = await verifyWithHumanPassport(
-    level,
-    userData.userAddress
-  );
-  results.push(hpResult);
+  // suppress unused warning
+  void plan;
 
   // Aggregate results
   const allChecks = results.flatMap((r) => r.checks);

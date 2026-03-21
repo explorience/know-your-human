@@ -11,7 +11,7 @@
 import type { Address } from "viem";
 
 export interface PaymentTier {
-  level: "basic" | "standard" | "enhanced";
+  level: "starter" | "basic" | "standard" | "enhanced";
   priceUSD: string;
   priceCUSD: string;
   description: string;
@@ -50,23 +50,29 @@ export interface x402PaymentResult {
 
 // Payment tiers
 export const PAYMENT_TIERS: Record<string, PaymentTier> = {
+  starter: {
+    level: "starter",
+    priceUSD: "$0.001",
+    priceCUSD: "0.001",
+    description: "Starter — phone + social proof (no documents required)",
+  },
   basic: {
     level: "basic",
-    priceUSD: "$0.25",
-    priceCUSD: "0.25",
-    description: "Basic identity verification (phone)",
+    priceUSD: "$0.01",
+    priceCUSD: "0.01",
+    description: "Basic — ZK passport proof via Self Protocol",
   },
   standard: {
     level: "standard",
-    priceUSD: "$1.50",
-    priceCUSD: "1.50",
-    description: "Standard ID document verification",
+    priceUSD: "$0.25",
+    priceCUSD: "0.25",
+    description: "Standard — Gov ID + liveness via Human Passport",
   },
   enhanced: {
     level: "enhanced",
-    priceUSD: "$5.00",
-    priceCUSD: "5.00",
-    description: "Enhanced biometric + sanctions check",
+    priceUSD: "$0.75",
+    priceCUSD: "0.75",
+    description: "Enhanced — ZK passport + biometric KYC + AML screening",
   },
 };
 
@@ -78,7 +84,7 @@ const CUSD_ADDRESS_ALFAJORES = "0xEF4d55D6dE8e8d73232827Cd1e9b2F2dBb45bC80";
  * This is what the server sends back when payment is needed.
  */
 export function generate402Header(
-  level: "basic" | "standard" | "enhanced",
+  level: "starter" | "basic" | "standard" | "enhanced",
   resource: string
 ): string {
   const tier = PAYMENT_TIERS[level];
@@ -111,7 +117,7 @@ export function generate402Header(
 export async function verifyPayment(
   paymentHeader: string,
   requiredAmount: string,
-  level: "basic" | "standard" | "enhanced"
+  level: "starter" | "basic" | "standard" | "enhanced"
 ): Promise<x402PaymentResult> {
   const isDemoMode = !process.env.ISSUER_PRIVATE_KEY || paymentHeader.startsWith("demo:");
 
@@ -165,7 +171,7 @@ export async function verifyPayment(
  * Simulates the full x402 flow without real transactions.
  */
 export async function createDemoPayment(
-  level: "basic" | "standard" | "enhanced",
+  level: "starter" | "basic" | "standard" | "enhanced",
   payerAddress: string
 ): Promise<x402PaymentResult> {
   const tier = PAYMENT_TIERS[level];

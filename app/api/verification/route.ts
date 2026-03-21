@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "Invalid verification level. Use: basic, standard, or enhanced",
+            "Invalid verification level. Use: starter, basic, standard, or enhanced",
         },
         { status: 400 }
       );
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
     if (!paymentHeader && !skipPayment) {
       const resource = `${process.env.NEXT_PUBLIC_GATEWAY_URL || "http://localhost:3000"}/api/verification`;
       const paymentRequirements = generate402Header(
-        level as "basic" | "standard" | "enhanced",
+        level as "starter" | "basic" | "standard" | "enhanced",
         resource
       );
 
@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
       const paymentResult = await verifyPayment(
         paymentHeader,
         tier.priceCUSD,
-        level as "basic" | "standard" | "enhanced"
+        level as "starter" | "basic" | "standard" | "enhanced"
       );
       if (!paymentResult.success) {
         return NextResponse.json(
@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
     // Create Self Protocol verification session
     const selfSession = await createVerificationSession(
       userAddress,
-      level as "basic" | "standard" | "enhanced"
+      level as "starter" | "basic" | "standard" | "enhanced"
     );
 
     // Store the Self session ID for webhook callbacks
@@ -203,7 +203,7 @@ export async function POST(request: NextRequest) {
 
     // Multi-provider verification
     const multiProviderResult = await executeVerification(
-      level as "basic" | "standard" | "enhanced",
+      level as "starter" | "basic" | "standard" | "enhanced",
       { userAddress, agentAddress, agentId: requestData.agentId }
     );
     storedRequest.providerResults = multiProviderResult;
@@ -237,7 +237,7 @@ export async function POST(request: NextRequest) {
 
     const demoMode = multiProviderResult.demoMode;
 
-    const verificationPlan = getVerificationPlan(level as "basic" | "standard" | "enhanced");
+    const verificationPlan = getVerificationPlan(level as "starter" | "basic" | "standard" | "enhanced");
 
     const response = NextResponse.json({
       verificationId,
