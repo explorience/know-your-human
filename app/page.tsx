@@ -71,7 +71,7 @@ export default function LandingPage() {
       <Header />
 
       {/* Hero section */}
-      <section className="pt-40 pb-24 px-4 sm:px-6 relative overflow-hidden">
+      <section className="pt-32 sm:pt-40 pb-16 sm:pb-24 px-6 sm:px-8 lg:px-12 relative overflow-hidden">
         <div
           className="absolute top-20 left-1/4 w-96 h-96 rounded-full opacity-10 blur-3xl pointer-events-none"
           style={{
@@ -85,7 +85,7 @@ export default function LandingPage() {
           }}
         />
 
-        <div className="w-full max-w-5xl mx-auto text-center relative z-10 px-2">
+        <div className="w-full max-w-4xl mx-auto text-center relative z-10">
           <div className="flex items-center justify-center gap-2 mb-6">
             <span className="badge badge-green text-xs">
               🏆 Celo Hackathon 2026
@@ -95,7 +95,7 @@ export default function LandingPage() {
             </span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-6 leading-tight tracking-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight tracking-tight">
             Know Your Human
             <br />
             <span className="gradient-text">KYC for the Celo Ecosystem</span>
@@ -115,7 +115,7 @@ export default function LandingPage() {
             <strong className="text-gray-300">$0.75</strong> per verification. Zero PII stored.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 sm:mb-16">
             <Link href="/demo" className="btn-primary text-base px-6 py-3">
               🚀 Try Live Demo
             </Link>
@@ -134,8 +134,8 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing tiers */}
-      <section className="py-24 px-4 sm:px-6" id="pricing">
-        <div className="w-full max-w-6xl mx-auto">
+      <section className="py-16 sm:py-24 px-6 sm:px-8 lg:px-12" id="pricing">
+        <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-6">
               Four Tiers.{" "}
@@ -147,7 +147,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8">
             <VerificationCard
               tier="starter"
               price="$0.001"
@@ -212,8 +212,8 @@ export default function LandingPage() {
       </section>
 
       {/* How it works */}
-      <section className="py-24 px-4 sm:px-6 bg-gradient-to-b from-transparent to-[#0d1117]/50" id="how">
-        <div className="w-full max-w-5xl mx-auto">
+      <section className="py-16 sm:py-24 px-6 sm:px-8 lg:px-12 bg-gradient-to-b from-transparent to-[#0d1117]/50" id="how">
+        <div className="w-full max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-6">
               How It <span className="gradient-text">Works</span>
@@ -248,8 +248,8 @@ export default function LandingPage() {
       </section>
 
       {/* ERC-8004 */}
-      <section className="py-24 px-4 sm:px-6">
-        <div className="w-full max-w-4xl mx-auto">
+      <section className="py-16 sm:py-24 px-6 sm:px-8 lg:px-12">
+        <div className="w-full max-w-3xl mx-auto">
           <div className="glass-card rounded-3xl p-8 sm:p-12">
             <div className="flex flex-col md:flex-row gap-8 items-start">
               <div className="flex-shrink-0 text-5xl">🤖</div>
@@ -280,8 +280,8 @@ export default function LandingPage() {
       </section>
 
       {/* Use cases */}
-      <section className="py-24 px-4 sm:px-6" id="use-cases">
-        <div className="w-full max-w-5xl mx-auto">
+      <section className="py-16 sm:py-24 px-6 sm:px-8 lg:px-12" id="use-cases">
+        <div className="w-full max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-6">
               Real <span className="gradient-text">Use Cases</span>
@@ -303,8 +303,8 @@ export default function LandingPage() {
       </section>
 
       {/* Tech stack */}
-      <section className="py-20 px-4 sm:px-6">
-        <div className="w-full max-w-4xl mx-auto text-center">
+      <section className="py-16 sm:py-20 px-6 sm:px-8 lg:px-12">
+        <div className="w-full max-w-3xl mx-auto text-center">
           <p className="text-xs text-gray-600 uppercase tracking-widest mb-2 font-semibold">
             Powered By
           </p>
@@ -322,7 +322,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-24 px-4 sm:px-6">
+      <section className="py-16 sm:py-24 px-6 sm:px-8 lg:px-12">
         <div className="w-full max-w-3xl mx-auto">
           <div
             className="rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden"
