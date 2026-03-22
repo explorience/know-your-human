@@ -8,26 +8,26 @@ const howItWorks = [
   {
     step: "01",
     title: "Agent or dApp Requests Verification",
-    desc: "An AI agent or dApp calls the KYH API with a wallet address and desired tier. Payment is made automatically via x402 — as little as $0.001 cUSD.",
+    desc: "An AI agent (identified via ERC-8004) or dApp calls the KYH API with a wallet address and desired tier. No API keys needed — the wallet IS the identity.",
     icon: "🤖",
   },
   {
     step: "02",
     title: "x402 Micropayment in cUSD",
-    desc: "The gateway issues a 402 Payment Required response. The agent pays automatically in cUSD on Celo. No invoices, no contracts, no minimums.",
+    desc: "KYH returns a 402 Payment Required response. The caller pays automatically in cUSD on Celo. No invoices, no sign-ups, no minimums.",
     icon: "💳",
   },
   {
     step: "03",
     title: "Human Verifies Once",
-    desc: "The human receives a verification link. Depending on tier: tap passport NFC chip, complete a liveness check, or simply confirm their phone number. Takes 5–120 seconds.",
+    desc: "The human receives a verification link. Depending on tier: scan passport NFC via Self Protocol, complete a liveness check via Didit, or confirm social presence via Human Passport. Takes 5–120 seconds.",
     icon: "📱",
   },
   {
     step: "04",
-    title: "EAS Credential Issued on Celo",
-    desc: "KYH issues an EAS attestation to the human's wallet — valid for 7–90 days. Any agent or dApp can now check that credential instantly, for free, via a single contract call.",
-    icon: "⛓️",
+    title: "EAS Attestation Issued on Celo",
+    desc: "KYH issues an EAS attestation to the human's wallet — valid for 90 days. Any agent or dApp reads it for free with a single contract call. Your identity follows you to Celo.",
+    icon: "📜",
   },
 ];
 
@@ -103,15 +103,16 @@ export default function LandingPage() {
 
           <p className="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto mb-4 leading-relaxed">
             The first identity verification API built for AI agents and dApps on Celo.
-            Verify once. Credential lives on-chain.{" "}
-            <strong className="text-white">Anyone checks it for free.</strong>
+            Verify once. Credential lives on-chain for 90 days.{" "}
+            <strong className="text-white">Any agent reads the credential for free.</strong>
           </p>
           <p className="text-base text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-            From <strong className="text-gray-300">$0.001</strong> (phone + social, no documents) to{" "}
-            <strong className="text-gray-300">$0.75</strong> (full biometric KYC + AML).
-            Payments via <strong className="text-white">x402</strong>.
-            Credentials via <strong className="text-white">EAS on Celo</strong>.
-            Zero PII stored.
+            Your identity follows you to Celo. Agents pay via{" "}
+            <strong className="text-white">x402</strong> in cUSD — no API keys, no sign-ups.
+            Credentials issued as{" "}
+            <strong className="text-white">EAS attestations</strong> on Celo.
+            From <strong className="text-gray-300">$0.001</strong> to{" "}
+            <strong className="text-gray-300">$0.75</strong> per verification. Zero PII stored.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
@@ -142,7 +143,7 @@ export default function LandingPage() {
             </h2>
             <p className="text-gray-400 max-w-lg mx-auto leading-relaxed">
               Pay per verification in cUSD on Celo. No subscriptions, no minimums.
-              Agents pay automatically via x402. Credentials reusable for 7–90 days.
+              Agents pay automatically via x402. All credentials valid for 90 days.
             </p>
           </div>
 
@@ -156,7 +157,7 @@ export default function LandingPage() {
                 "Social presence proof",
                 "Built for the unbanked",
                 "EAS credential on Celo",
-                "7-day validity",
+                "90-day validity",
               ]}
             />
             <VerificationCard
@@ -168,7 +169,7 @@ export default function LandingPage() {
                 "Humanity + age verified",
                 "No biometrics needed",
                 "EAS credential on Celo",
-                "30-day validity",
+                "90-day validity",
               ]}
             />
             <VerificationCard
@@ -180,7 +181,7 @@ export default function LandingPage() {
                 "Face match verification",
                 "ZK proof — no PII stored",
                 "EAS credential on Celo",
-                "60-day validity",
+                "90-day validity",
               ]}
               highlighted={true}
             />
@@ -198,13 +199,13 @@ export default function LandingPage() {
             />
           </div>
 
-          {/* Sponsor economics callout */}
+          {/* Verify once callout */}
           <div className="mt-14 rounded-2xl p-8 border border-[#35D07F]/20 bg-[#35D07F]/5 max-w-3xl mx-auto text-center">
-            <p className="text-sm text-[#35D07F] font-semibold mb-1">💡 Sponsor Economics</p>
+            <p className="text-sm text-[#35D07F] font-semibold mb-1">✨ Verify Once. Read Forever.</p>
             <p className="text-gray-300 text-sm leading-relaxed">
-              The first agent to verify a human earns back up to <strong className="text-white">2× their cost</strong> as
-              subsequent agents pay a small read fee. After that, they earn <strong className="text-white">10% perpetually</strong>.
-              Enforced on-chain by KYHRegistry.sol — no trust required.
+              The first verification costs <strong className="text-white">$0.001–$0.75</strong> depending on tier.
+              After that, the EAS credential is free to read for any agent or dApp — forever.
+              No recurring fees. No subscriptions. <strong className="text-white">Pure public good.</strong>
             </p>
           </div>
         </div>
@@ -246,6 +247,38 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ERC-8004 */}
+      <section className="py-24 px-4 sm:px-6">
+        <div className="w-full max-w-4xl mx-auto">
+          <div className="glass-card rounded-3xl p-8 sm:p-12">
+            <div className="flex flex-col md:flex-row gap-8 items-start">
+              <div className="flex-shrink-0 text-5xl">🤖</div>
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">
+                  Built for the <span className="gradient-text">Agentic Web</span>
+                </h2>
+                <p className="text-gray-400 leading-relaxed mb-4">
+                  Agents identify themselves via{" "}
+                  <strong className="text-white">ERC-8004</strong> — the on-chain agent registry.
+                  dApps use their wallet address. Both pay via x402 in cUSD. Both get the same result.
+                </p>
+                <p className="text-gray-400 leading-relaxed mb-4">
+                  No API keys. No sign-ups. No dashboards. The wallet IS the identity.
+                  If your wallet has an ERC-8004 registration, KYH shows your agent name and metadata.
+                  If not, you&apos;re just an address — and that&apos;s fine too.
+                </p>
+                <div className="flex items-center gap-3 mt-6 p-3 rounded-xl bg-[#35D07F]/5 border border-[#35D07F]/20">
+                  <span className="text-sm">⛓️</span>
+                  <span className="text-sm text-gray-300">
+                    KYH is registered as <strong className="text-[#35D07F]">ERC-8004 Agent #24212</strong> on Base
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Use cases */}
       <section className="py-24 px-4 sm:px-6" id="use-cases">
         <div className="w-full max-w-5xl mx-auto">
@@ -272,8 +305,11 @@ export default function LandingPage() {
       {/* Tech stack */}
       <section className="py-20 px-4 sm:px-6">
         <div className="w-full max-w-4xl mx-auto text-center">
-          <p className="text-xs text-gray-600 uppercase tracking-widest mb-6 font-semibold">
+          <p className="text-xs text-gray-600 uppercase tracking-widest mb-2 font-semibold">
             Powered By
+          </p>
+          <p className="text-sm text-gray-500 mb-6 italic">
+            Your identity follows you to Celo.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             {techBadges.map((badge) => (
@@ -306,7 +342,7 @@ export default function LandingPage() {
             </p>
             <p className="text-gray-400 mb-8 max-w-xl mx-auto text-sm leading-relaxed">
               Know Your Human makes it seamless — one API, four tiers, credentials
-              that travel with your wallet. Agents pay. Humans verify once. Everyone benefits.
+              that travel with your wallet for 90 days. Agents pay. Humans verify once. Everyone benefits.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/demo" className="btn-primary text-base px-6 py-3">

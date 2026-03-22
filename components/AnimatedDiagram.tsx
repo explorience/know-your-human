@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 
 const nodes = [
-  { id: "agent", label: "AI Agent", icon: "🤖", desc: "Requests KYC" },
-  { id: "gateway", label: "KYC Gateway", icon: "🔐", desc: "Validates & routes" },
-  { id: "self", label: "Self Protocol", icon: "📱", desc: "Scans passport NFC" },
-  { id: "zk", label: "ZK Proof", icon: "⚡", desc: "Generates proof" },
-  { id: "celo", label: "Celo Chain", icon: "⛓️", desc: "Records attestation" },
+  { id: "agent", label: "Agent / dApp", icon: "🤖", desc: "Requests KYC" },
+  { id: "gateway", label: "KYH Gateway", icon: "🔐", desc: "Routes & charges via x402" },
+  { id: "provider", label: "Verification", icon: "📱", desc: "Self · HP · Didit" },
+  { id: "zk", label: "ZK Proof", icon: "⚡", desc: "Privacy-preserving proof" },
+  { id: "eas", label: "EAS on Celo", icon: "📜", desc: "On-chain credential" },
 ];
 
 export default function AnimatedDiagram() {

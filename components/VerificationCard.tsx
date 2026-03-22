@@ -15,7 +15,7 @@ const tierConfig = {
     bgColor: "bg-purple-500/5",
     badgeColor: "badge-blue",
     description: "Phone + social proof — no documents",
-    validity: "7-day credential",
+    validity: "90-day credential",
     providers: "Phone · Social Stamps",
   },
   basic: {
@@ -26,7 +26,7 @@ const tierConfig = {
     bgColor: "bg-blue-500/5",
     badgeColor: "badge-blue",
     description: "ZK passport proof via Self Protocol",
-    validity: "30-day credential",
+    validity: "90-day credential",
     providers: "Self Protocol",
   },
   standard: {
@@ -37,7 +37,7 @@ const tierConfig = {
     bgColor: "bg-[#35D07F]/5",
     badgeColor: "badge-green",
     description: "Gov ID + liveness via ZK proofs",
-    validity: "60-day credential",
+    validity: "90-day credential",
     providers: "Human Passport",
   },
   enhanced: {
