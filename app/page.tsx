@@ -25,6 +25,12 @@ const howItWorks = [
   },
   {
     step: "04",
+    title: "Venice Decides Privately",
+    desc: "All verification signals are sent to Venice AI for holistic analysis. Venice reasons about cross-provider patterns, flags anomalies, and makes the final pass/fail decision — with zero data retention. Private cognition, not hard-coded rules.",
+    icon: "🧠",
+  },
+  {
+    step: "05",
     title: "EAS Attestation Issued on Celo",
     desc: "KYH issues an EAS attestation to the human's wallet — valid for 90 days. Any agent or dApp reads it for free with a single contract call. Your identity follows you to Celo.",
     icon: "📜",
@@ -33,6 +39,7 @@ const howItWorks = [
 
 const techBadges = [
   { label: "Celo", color: "badge-green", icon: "🟡" },
+  { label: "Venice AI", color: "badge-yellow", icon: "🧠" },
   { label: "Self Protocol", color: "badge-blue", icon: "🔐" },
   { label: "Human Passport", color: "badge-green", icon: "🛂" },
   { label: "Didit", color: "badge-blue", icon: "🪪" },
@@ -40,6 +47,7 @@ const techBadges = [
   { label: "ZK-SNARKs", color: "badge-green", icon: "⚡" },
   { label: "EAS", color: "badge-blue", icon: "📜" },
   { label: "ERC-8004", color: "badge-yellow", icon: "🤖" },
+  { label: "ENS", color: "badge-blue", icon: "🔗" },
 ];
 
 const useCases = [
@@ -111,8 +119,9 @@ export default function LandingPage() {
             <strong className="text-white">x402</strong> in cUSD — no API keys, no sign-ups.
             Credentials issued as{" "}
             <strong className="text-white">EAS attestations</strong> on Celo.
+            Powered by <strong className="text-white">Venice AI</strong> for private cognition — verify the human, forget the data.
             From <strong className="text-gray-300">free</strong> to{" "}
-            <strong className="text-gray-300">$0.75</strong> per verification. Zero PII stored.
+            <strong className="text-gray-300">$0.75</strong> per verification.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
@@ -305,6 +314,69 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Venice AI - Private Cognition */}
+      <section className="py-16 sm:py-24 px-8 sm:px-12 lg:px-16" id="venice">
+        <div className="w-full max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <span className="badge badge-yellow text-xs mb-4">🧠 Core Intelligence</span>
+            <h2 className="text-3xl sm:text-4xl font-black text-white mb-6">
+              Powered by <span className="text-[#FCFF52]">Venice AI</span>
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed">
+              Venice is KYH&apos;s core reasoning engine. Every verification decision is made by Venice&apos;s
+              private inference — not hard-coded rules. Zero data retention means your identity is verified,
+              never stored.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="glass-card rounded-xl p-6 border border-[#FCFF52]/20">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">🔒</span>
+                <h3 className="text-lg font-bold text-white">Zero Data Retention</h3>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Venice processes verification signals and returns a decision. Nothing is stored —
+                no logs, no training data, no records. The privacy guarantee is structural, not just a policy page.
+              </p>
+            </div>
+
+            <div className="glass-card rounded-xl p-6 border border-[#FCFF52]/20">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">🧠</span>
+                <h3 className="text-lg font-bold text-white">Holistic Reasoning</h3>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Venice analyzes ALL provider signals together — catching patterns that simple threshold logic can&apos;t.
+                &ldquo;Liveness passed but wallet is 2 hours old&rdquo; gets flagged. Cross-provider anomalies get caught.
+              </p>
+            </div>
+
+            <div className="glass-card rounded-xl p-6 border border-[#FCFF52]/20">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">⚡</span>
+                <h3 className="text-lg font-bold text-white">Private Cognition</h3>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Direct Venice API — no middlemen, no aggregators. Your verification data never touches
+                a third-party server. Venice sees anonymized signals, decides, and forgets.
+              </p>
+            </div>
+
+            <div className="glass-card rounded-xl p-6 border border-[#FCFF52]/20">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">🛡️</span>
+                <h3 className="text-lg font-bold text-white">Deterministic Fallback</h3>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                If Venice is unreachable, KYH falls back to deterministic scoring — clearly labeled as
+                &ldquo;FALLBACK&rdquo; in the response. No silent degradation. The agent always knows who decided.
+              </p>
             </div>
           </div>
         </div>
