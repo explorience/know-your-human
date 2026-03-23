@@ -116,7 +116,7 @@ export async function POST(
       durationMs: 0,
       demoMode: false,
       providerResults: [selfSignals],
-      veniceVerdict,
+      veniceVerdict: veniceVerdict ?? undefined,
     };
     const evidence = buildEvidence(multiProviderResult, requestData.level, expiresAtDate);
     const evidenceHash = await storeEvidence(evidence);
