@@ -26,6 +26,8 @@ import {
   type MultiProviderResult,
 } from "@/lib/providers";
 import type { Address } from "viem";
+import { enrichWithENS, isENSName, resolveToAddress } from "@/lib/ens";
+import { analyzeVerificationPrivately, getPrivacyAttestation } from "@/lib/venice";
 
 // In-memory store for verification requests (use Redis in production)
 export const verificationRequests = new Map<
@@ -68,6 +70,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Resolve ENS names to addresses if needed
+    let resolvedAgent = agentAddress;
+    let resolvedUser = userAddress;
+    let agentENS: string | undefined;
+    let userENS: string | undefined;
+
+    if (isENSName(agentAddress)) {
+      const resolved = await resolveToAddress(agentAddress);
+      if (!resolved) {
+        return NextResponse.json(
+          { error: `Could not resolve ENS name: ${agentAddress}` },
+          { status: 400 }
+        );
+      }
+      agentENS = agentAddress;
+      resolvedAgent = resolved;
+    }
+
+    if (isENSName(userAddress)) {
+      const resolved = await resolveToAddress(userAddress);
+      if (!resolved) {
+        return NextResponse.json(
+          { error: `Could not resolve ENS name: ${userAddress}` },
+          { status: 400 }
+        );
+      }
+      userENS = userAddress;
+      resolvedUser = resolved;
+    }
+
     // Resolve tier name (supports both old and new names)
     const level = resolveTier(rawTier || rawLevel);
     if (!level) {
@@ -104,7 +136,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Rate limiting
-    const rateLimitResult = checkRateLimit(agentAddress, level);
+    const rateLimitResult = checkRateLimit(resolvedAgent, level);
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         {
@@ -200,9 +232,9 @@ export async function POST(request: NextRequest) {
 
     const requestData = {
       id: verificationId,
-      agentAddress: agentAddress.toLowerCase(),
+      agentAddress: resolvedAgent.toLowerCase(),
       agentId: agentId !== undefined ? Number(agentId) : undefined,
-      userAddress: userAddress.toLowerCase(),
+      userAddress: resolvedUser.toLowerCase(),
       level,
       status: "pending" as const,
       paymentTxHash: paymentReceipt?.txHash,
@@ -225,7 +257,7 @@ export async function POST(request: NextRequest) {
     // Multi-provider verification
     const multiProviderResult = await executeVerification(
       level as TierLevel,
-      { userAddress, agentAddress, agentId: requestData.agentId }
+      { userAddress: resolvedUser, agentAddress: resolvedAgent, agentId: requestData.agentId }
     );
     storedRequest.providerResults = multiProviderResult;
 
@@ -235,7 +267,7 @@ export async function POST(request: NextRequest) {
       .join("+");
 
     const easAttestation = await issueKYHCredential(
-      userAddress,
+      resolvedUser,
       level as TierLevel,
       providerNames,
       !multiProviderResult.overallSuccess || multiProviderResult.demoMode
@@ -252,12 +284,37 @@ export async function POST(request: NextRequest) {
 
     const verificationPlan = getVerificationPlan(level as TierLevel);
 
+    // Venice private risk analysis (for biometric and fullkyc tiers)
+    const veniceAnalysis = (level === "biometric" || level === "fullkyc")
+      ? await analyzeVerificationPrivately({ tier: level })
+      : null;
+
+    // Enrich with ENS names for the response
+    const [agentENSData, userENSData] = await Promise.all([
+      enrichWithENS(resolvedAgent.toLowerCase()),
+      enrichWithENS(resolvedUser.toLowerCase()),
+    ]);
+
     const response = NextResponse.json({
       verificationId,
       status: storedRequest.status,
       level,
       agentId: requestData.agentId,
       expiresAt,
+      identity: {
+        agent: {
+          address: resolvedAgent.toLowerCase(),
+          ...(agentENS ? { inputENS: agentENS } : {}),
+          ...(agentENSData.ensName ? { ensName: agentENSData.ensName } : {}),
+          ...(agentENSData.ensAvatar ? { ensAvatar: agentENSData.ensAvatar } : {}),
+        },
+        user: {
+          address: resolvedUser.toLowerCase(),
+          ...(userENS ? { inputENS: userENS } : {}),
+          ...(userENSData.ensName ? { ensName: userENSData.ensName } : {}),
+          ...(userENSData.ensAvatar ? { ensAvatar: userENSData.ensAvatar } : {}),
+        },
+      },
       selfVerificationUrl: selfSession.verificationUrl,
       selfQrData: selfSession.qrData,
       attestationHash: storedRequest.attestationHash,
@@ -298,6 +355,16 @@ export async function POST(request: NextRequest) {
         discountApplied,
         discountPercent: discountApplied ? 20 : 0,
       },
+      ...(veniceAnalysis ? {
+        privacyAnalysis: {
+          riskScore: veniceAnalysis.riskScore,
+          flags: veniceAnalysis.flags,
+          confidence: veniceAnalysis.confidence,
+          dataRetention: "none",
+          provider: "Venice AI",
+        },
+      } : {}),
+      privacy: getPrivacyAttestation(),
       message: demoMode
         ? "Demo mode: multi-provider verification simulated"
         : "Verification complete via Self Protocol + Didit + Human Passport.",

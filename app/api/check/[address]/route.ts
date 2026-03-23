@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { enrichWithENS, isENSName, resolveToAddress } from "@/lib/ens";
 
 /**
  * GET /api/check/{address}
  *
  * Free credential check. Returns the latest verification status for an address.
  * This is the "read forever for free" endpoint — any agent or dApp can call it.
+ *
+ * Accepts:
+ * - Hex addresses: /api/check/0xABC123...
+ * - ENS names: /api/check/vitalik.eth
+ *
+ * Returns ENS name + avatar alongside every response when available.
  *
  * In production, this queries the EAS contract on Celo directly.
  * Currently uses the in-memory verification store for demo purposes.
@@ -17,16 +24,38 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ address: string }> }
 ) {
-  const { address } = await params;
+  const { address: rawInput } = await params;
 
-  if (!address || !address.match(/^0x[a-fA-F0-9]{40}$/)) {
+  // Accept both hex addresses and ENS names
+  let resolvedAddress: string | null = null;
+  let inputType: "address" | "ens" = "address";
+
+  if (isENSName(rawInput)) {
+    inputType = "ens";
+    resolvedAddress = await resolveToAddress(rawInput);
+    if (!resolvedAddress) {
+      return NextResponse.json(
+        {
+          error: "ENS name could not be resolved",
+          input: rawInput,
+          hint: "The ENS name may not exist or may not have an address record set.",
+        },
+        { status: 404 }
+      );
+    }
+  } else if (rawInput.match(/^0x[a-fA-F0-9]{40}$/)) {
+    resolvedAddress = rawInput;
+  } else {
     return NextResponse.json(
-      { error: "Invalid Ethereum address" },
+      { error: "Invalid input. Provide a hex address (0x...) or ENS name (name.eth)" },
       { status: 400 }
     );
   }
 
-  const normalizedAddress = address.toLowerCase();
+  const normalizedAddress = resolvedAddress.toLowerCase();
+
+  // Enrich with ENS (resolve name + avatar)
+  const ensData = await enrichWithENS(normalizedAddress);
 
   // Find latest completed verification for this address
   const verifications = Array.from(verificationRequests.values())
@@ -41,11 +70,18 @@ export async function GET(
 
   const latest = verifications[0];
 
+  const identity = {
+    address: normalizedAddress,
+    ...(ensData.ensName ? { ensName: ensData.ensName } : {}),
+    ...(ensData.ensAvatar ? { ensAvatar: ensData.ensAvatar } : {}),
+    ...(inputType === "ens" ? { resolvedFrom: rawInput } : {}),
+  };
+
   if (!latest) {
     return NextResponse.json(
       {
         verified: false,
-        address: normalizedAddress,
+        ...identity,
         message: "No credential found. Use POST /api/verify to start verification.",
       },
       {
@@ -66,7 +102,7 @@ export async function GET(
       {
         verified: false,
         expired: true,
-        address: normalizedAddress,
+        ...identity,
         lastTier: latest.level,
         expiredAt: expiresAt.toISOString(),
         message: "Credential expired. Use POST /api/verify to re-verify.",
@@ -82,7 +118,7 @@ export async function GET(
   return NextResponse.json(
     {
       verified: true,
-      address: normalizedAddress,
+      ...identity,
       tier: latest.level,
       attestationUID: latest.attestationHash,
       issuedAt: latest.createdAt,
@@ -90,7 +126,6 @@ export async function GET(
       onChain: latest.attestationHash
         ? `https://celo.easscan.org/attestation/view/${latest.attestationHash}`
         : null,
-      // Agents can also query EAS directly:
       directQuery: {
         contract: "0x72E1d8ccf5299fb36fEfD8CC4394B8ef7e98Af92",
         schemaUID:

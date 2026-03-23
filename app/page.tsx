@@ -67,11 +67,11 @@ const useCases = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-[#0a0a0a] overflow-x-hidden">
       <Header />
 
       {/* Hero section */}
-      <section className="pt-32 sm:pt-40 pb-16 sm:pb-24 px-6 sm:px-8 lg:px-12 relative overflow-hidden">
+      <section className="pt-32 sm:pt-40 pb-16 sm:pb-24 px-8 sm:px-12 lg:px-16 relative overflow-hidden">
         <div
           className="absolute top-20 left-1/4 w-96 h-96 rounded-full opacity-10 blur-3xl pointer-events-none"
           style={{
@@ -158,8 +158,8 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing tiers */}
-      <section className="py-16 sm:py-24 px-6 sm:px-8 lg:px-12" id="pricing">
-        <div className="w-full max-w-7xl mx-auto">
+      <section className="py-16 sm:py-24 px-8 sm:px-12 lg:px-16" id="pricing">
+        <div className="w-full max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-6">
               Four Tiers.{" "}
@@ -171,7 +171,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
             <VerificationCard
               tier="reputation"
               price="Free"
@@ -236,7 +236,7 @@ export default function LandingPage() {
       </section>
 
       {/* How it works */}
-      <section className="py-16 sm:py-24 px-6 sm:px-8 lg:px-12 bg-gradient-to-b from-transparent to-[#0d1117]/50" id="how">
+      <section className="py-16 sm:py-24 px-8 sm:px-12 lg:px-16 bg-gradient-to-b from-transparent to-[#0d1117]/50" id="how">
         <div className="w-full max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-6">
@@ -272,7 +272,7 @@ export default function LandingPage() {
       </section>
 
       {/* ERC-8004 */}
-      <section className="py-16 sm:py-24 px-6 sm:px-8 lg:px-12">
+      <section className="py-16 sm:py-24 px-8 sm:px-12 lg:px-16">
         <div className="w-full max-w-3xl mx-auto">
           <div className="glass-card rounded-3xl p-8 sm:p-12">
             <div className="flex flex-col md:flex-row gap-8 items-start">
@@ -311,7 +311,7 @@ export default function LandingPage() {
       </section>
 
       {/* Use cases */}
-      <section className="py-16 sm:py-24 px-6 sm:px-8 lg:px-12" id="use-cases">
+      <section className="py-16 sm:py-24 px-8 sm:px-12 lg:px-16" id="use-cases">
         <div className="w-full max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-6">
@@ -334,7 +334,7 @@ export default function LandingPage() {
       </section>
 
       {/* Tech stack */}
-      <section className="py-16 sm:py-20 px-6 sm:px-8 lg:px-12">
+      <section className="py-16 sm:py-20 px-8 sm:px-12 lg:px-16">
         <div className="w-full max-w-3xl mx-auto text-center">
           <p className="text-xs text-gray-600 uppercase tracking-widest mb-2 font-semibold">
             Powered By
@@ -353,7 +353,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-24 px-6 sm:px-8 lg:px-12">
+      <section className="py-16 sm:py-24 px-8 sm:px-12 lg:px-16">
         <div className="w-full max-w-3xl mx-auto">
           <div
             className="rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden"
