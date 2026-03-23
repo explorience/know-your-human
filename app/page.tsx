@@ -47,7 +47,7 @@ const techLogos = [
   { label: "x402", logo: null, url: "https://www.x402.org" },
   { label: "ERC-8004", logo: null, url: "https://eips.ethereum.org/EIPS/eip-8004" },
   { label: "ZK-SNARKs", logo: null, url: null },
-  { label: "Human Passport", logo: null, url: "https://humanpassport.io" },
+  { label: "Human Passport", logo: "/logos/hp.png", url: "https://passport.human.tech" },
 ];
 
 const useCases = [
