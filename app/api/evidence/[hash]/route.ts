@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getEvidence } from "@/lib/claims";
+import { getEvidence, getEvidenceIPFS } from "@/lib/claims";
 
 /**
  * GET /api/evidence/{hash}
@@ -30,7 +30,15 @@ export async function GET(
     );
   }
 
-  return NextResponse.json(evidence, {
+  const ipfsCid = getEvidenceIPFS(normalizedHash);
+
+  return NextResponse.json({
+    ...evidence,
+    _meta: {
+      hash: normalizedHash,
+      ...(ipfsCid ? { ipfs: `ipfs://${ipfsCid}`, ipfsGateway: `https://gateway.pinata.cloud/ipfs/${ipfsCid}` } : {}),
+    },
+  }, {
     headers: {
       "Cache-Control": "public, max-age=3600, immutable",
     },

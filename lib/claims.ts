@@ -12,6 +12,7 @@
 
 import { createHash } from "crypto";
 import type { MultiProviderResult } from "./providers";
+import { pinToIPFS } from "./ipfs";
 
 export interface ClaimSet {
   version: string;
@@ -36,6 +37,8 @@ export interface ClaimSet {
 
 // In-memory evidence store (Redis in production)
 const evidenceStore = new Map<string, ClaimSet>();
+// Maps sha256 hash -> IPFS CID (when pinned)
+const evidenceIPFS = new Map<string, string>();
 
 /**
  * Extract structured claims from provider results.
@@ -132,11 +135,25 @@ export function buildEvidence(
 /**
  * Store evidence and return its content hash (sha256).
  * The hash is stored as evidenceRef in the EAS attestation.
+ * Also pins to IPFS if Pinata is configured.
  */
-export function storeEvidence(evidence: ClaimSet): string {
+export async function storeEvidence(evidence: ClaimSet): Promise<string> {
   const json = JSON.stringify(evidence, null, 2);
   const hash = "0x" + createHash("sha256").update(json).digest("hex");
   evidenceStore.set(hash, evidence);
+
+  // Pin to IPFS (non-blocking, best-effort)
+  const ipfsResult = await pinToIPFS(
+    evidence as unknown as Record<string, unknown>,
+    `kyh-evidence-${hash.slice(0, 10)}`
+  );
+
+  if (ipfsResult) {
+    // Store IPFS CID alongside the evidence
+    evidenceIPFS.set(hash, ipfsResult.cid);
+    console.log(`Evidence pinned to IPFS: ${ipfsResult.cid} (${ipfsResult.url})`);
+  }
+
   return hash;
 }
 
@@ -145,6 +162,13 @@ export function storeEvidence(evidence: ClaimSet): string {
  */
 export function getEvidence(hash: string): ClaimSet | null {
   return evidenceStore.get(hash) || null;
+}
+
+/**
+ * Get IPFS CID for evidence (if pinned).
+ */
+export function getEvidenceIPFS(hash: string): string | null {
+  return evidenceIPFS.get(hash) || null;
 }
 
 /**

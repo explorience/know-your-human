@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { enrichWithENS, isENSName, resolveToAddress } from "@/lib/ens";
-import { getEvidence } from "@/lib/claims";
+import { getEvidence, getEvidenceIPFS } from "@/lib/claims";
 
 /**
  * GET /api/check/{address}
@@ -135,6 +135,10 @@ export async function GET(
         evidence: {
           hash: evidenceHash,
           url: `https://knowyourhuman.xyz/api/evidence/${evidenceHash}`,
+          ...(getEvidenceIPFS(evidenceHash!) ? {
+            ipfs: `ipfs://${getEvidenceIPFS(evidenceHash!)}`,
+            ipfsGateway: `https://gateway.pinata.cloud/ipfs/${getEvidenceIPFS(evidenceHash!)}`,
+          } : {}),
         },
       } : {}),
       onChain: latest.attestationHash

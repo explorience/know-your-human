@@ -28,7 +28,7 @@ import {
 import type { Address } from "viem";
 import { enrichWithENS, isENSName, resolveToAddress } from "@/lib/ens";
 import { getPrivacyAttestation } from "@/lib/venice";
-import { buildEvidence, storeEvidence } from "@/lib/claims";
+import { buildEvidence, storeEvidence, getEvidenceIPFS } from "@/lib/claims";
 
 // In-memory store for verification requests (use Redis in production)
 export const verificationRequests = new Map<
@@ -278,10 +278,11 @@ export async function POST(request: NextRequest) {
     storedRequest.attestationHash = easAttestation.uid;
     storedRequest.status = multiProviderResult.overallSuccess ? "completed" : "failed";
 
-    // Build and store structured evidence (claims layer)
+    // Build and store structured evidence (claims layer) + pin to IPFS
     const expiresAtDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
     const evidence = buildEvidence(multiProviderResult, level, expiresAtDate);
-    const evidenceHash = storeEvidence(evidence);
+    const evidenceHash = await storeEvidence(evidence);
+    const ipfsCid = getEvidenceIPFS(evidenceHash);
     storedRequest.evidenceHash = evidenceHash;
 
     console.log(
@@ -325,6 +326,7 @@ export async function POST(request: NextRequest) {
       evidence: {
         hash: evidenceHash,
         url: `https://knowyourhuman.xyz/api/evidence/${evidenceHash}`,
+        ...(ipfsCid ? { ipfs: `ipfs://${ipfsCid}`, ipfsGateway: `https://gateway.pinata.cloud/ipfs/${ipfsCid}` } : {}),
         claims: evidence.claims,
         providers: evidence.providers,
       },
