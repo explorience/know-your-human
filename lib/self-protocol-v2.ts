@@ -43,7 +43,7 @@ export interface VerificationSession {
   expiresAt: string;
 }
 
-const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || "https://knowyourhuman.xyz";
+const GATEWAY_URL = (process.env.NEXT_PUBLIC_GATEWAY_URL || "https://knowyourhuman.xyz").replace(/[\r\n]/g, '');
 const SELF_SCOPE = "kyh-gateway";
 const SELF_APP_NAME = "Know Your Human";
 

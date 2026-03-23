@@ -256,7 +256,60 @@ export async function POST(request: NextRequest) {
     const storedRequest = verificationRequests.get(verificationId)!;
     storedRequest.selfSessionId = selfSession.sessionId;
 
-    // Multi-provider verification
+    // For document/biometric/fullkyc tiers: Self Protocol NFC scan is required.
+    // Return pending status with QR data — the callback endpoint will complete verification
+    // after the user scans their passport with the Self app.
+    const selfRequiredTiers = ["document", "biometric", "fullkyc"];
+    if (selfRequiredTiers.includes(level)) {
+      const verificationPlan = getVerificationPlan(level as TierLevel);
+
+      const response = NextResponse.json({
+        verificationId,
+        status: "pending",
+        level,
+        agentId: requestData.agentId,
+        expiresAt,
+        identity: {
+          agent: { address: resolvedAgent.toLowerCase(), ...(agentENS ? { inputENS: agentENS } : {}) },
+          user: { address: resolvedUser.toLowerCase(), ...(userENS ? { inputENS: userENS } : {}) },
+        },
+        selfVerificationUrl: selfSession.verificationUrl,
+        selfQrData: selfSession.qrData,
+        selfSessionId: selfSession.sessionId,
+        callbackUrl: `${(process.env.NEXT_PUBLIC_GATEWAY_URL || "https://knowyourhuman.xyz").replace(/[\r\n]/g, '')}/api/verification/${selfSession.sessionId}/callback`,
+        statusUrl: `${(process.env.NEXT_PUBLIC_GATEWAY_URL || "https://knowyourhuman.xyz").replace(/[\r\n]/g, '')}/api/verification/${selfSession.sessionId}/callback`,
+        paymentReceipt,
+        verificationPlan: {
+          providers: verificationPlan.providers,
+          checks: verificationPlan.checks,
+          estimatedCostUSD: verificationPlan.estimatedCostUSD,
+        },
+        selfAgentId: hasAgentId
+          ? { verified: true, agentAddress: agentIdStatus.agentAddress, agentId: agentIdStatus.agentId, discountApplied }
+          : { verified: false },
+        pricing: {
+          tier: level,
+          originalPrice: tierConfig.priceCUSD,
+          finalPrice: adjustedPrice,
+          discountApplied,
+          discountPercent: discountApplied ? 20 : 0,
+        },
+        privacy: getPrivacyAttestation(),
+        nextStep: "Scan the QR code with the Self app on your phone. Tap your NFC passport when prompted. The verification will complete automatically via the callback endpoint.",
+        message: "Verification session created. Waiting for Self Protocol NFC passport scan.",
+      });
+
+      response.headers.set("X-RateLimit-Limit", String(rateLimitResult.limit));
+      response.headers.set("X-RateLimit-Remaining", String(rateLimitResult.remaining));
+      response.headers.set("X-RateLimit-Reset", rateLimitResult.resetAt.toISOString());
+
+      // Also store the Self session ID mapping so callback can find the verification
+      verificationRequests.set(selfSession.sessionId, storedRequest);
+
+      return response;
+    }
+
+    // For reputation tier: run immediately (no Self NFC scan needed)
     const multiProviderResult = await executeVerification(
       level as TierLevel,
       { userAddress: resolvedUser, agentAddress: resolvedAgent, agentId: requestData.agentId }
