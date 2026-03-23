@@ -9,10 +9,11 @@
   --font-family-sans: 'Inter', system-ui, sans-serif;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* Reset moved into @layer base so it doesn't override Tailwind utilities */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
 }
 
 html {
@@ -28,11 +29,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Global page centering */
-main, section {
-  margin-left: auto;
-  margin-right: auto;
-}
+
 
 /* Glassmorphism card */
 .glass-card {
