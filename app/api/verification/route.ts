@@ -28,6 +28,7 @@ import {
 import type { Address } from "viem";
 import { enrichWithENS, isENSName, resolveToAddress } from "@/lib/ens";
 import { getPrivacyAttestation } from "@/lib/venice";
+import { buildEvidence, storeEvidence } from "@/lib/claims";
 
 // In-memory store for verification requests (use Redis in production)
 export const verificationRequests = new Map<
@@ -41,6 +42,7 @@ export const verificationRequests = new Map<
     status: "pending" | "completed" | "failed";
     verificationId?: string;
     attestationHash?: string;
+    evidenceHash?: string;
     selfSessionId?: string;
     paymentTxHash?: string;
     providerResults?: MultiProviderResult;
@@ -276,8 +278,14 @@ export async function POST(request: NextRequest) {
     storedRequest.attestationHash = easAttestation.uid;
     storedRequest.status = multiProviderResult.overallSuccess ? "completed" : "failed";
 
+    // Build and store structured evidence (claims layer)
+    const expiresAtDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
+    const evidence = buildEvidence(multiProviderResult, level, expiresAtDate);
+    const evidenceHash = storeEvidence(evidence);
+    storedRequest.evidenceHash = evidenceHash;
+
     console.log(
-      `Verification ${storedRequest.status} for ${userAddress}: ${easAttestation.uid} (demo: ${easAttestation.demoMode})`
+      `Verification ${storedRequest.status} for ${userAddress}: ${easAttestation.uid} (demo: ${easAttestation.demoMode}, evidence: ${evidenceHash})`
     );
 
     const demoMode = easAttestation.demoMode;
@@ -314,6 +322,12 @@ export async function POST(request: NextRequest) {
       selfQrData: selfSession.qrData,
       attestationHash: storedRequest.attestationHash,
       attestation: formatAttestationResponse(easAttestation),
+      evidence: {
+        hash: evidenceHash,
+        url: `https://knowyourhuman.xyz/api/evidence/${evidenceHash}`,
+        claims: evidence.claims,
+        providers: evidence.providers,
+      },
       paymentReceipt,
       verificationPlan: {
         providers: verificationPlan.providers,

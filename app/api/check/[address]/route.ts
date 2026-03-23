@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { enrichWithENS, isENSName, resolveToAddress } from "@/lib/ens";
+import { getEvidence } from "@/lib/claims";
 
 /**
  * GET /api/check/{address}
@@ -115,6 +116,10 @@ export async function GET(
     );
   }
 
+  // Retrieve structured claims if evidence exists
+  const evidenceHash = latest.evidenceHash;
+  const evidence = evidenceHash ? getEvidence(evidenceHash) : null;
+
   return NextResponse.json(
     {
       verified: true,
@@ -123,6 +128,15 @@ export async function GET(
       attestationUID: latest.attestationHash,
       issuedAt: latest.createdAt,
       expiresAt: expiresAt.toISOString(),
+      // Structured claims (agents query these directly)
+      ...(evidence ? {
+        claims: evidence.claims,
+        providers: evidence.providers,
+        evidence: {
+          hash: evidenceHash,
+          url: `https://knowyourhuman.xyz/api/evidence/${evidenceHash}`,
+        },
+      } : {}),
       onChain: latest.attestationHash
         ? `https://celo.easscan.org/attestation/view/${latest.attestationHash}`
         : null,
