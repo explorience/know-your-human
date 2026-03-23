@@ -8,7 +8,7 @@ const howItWorks = [
   {
     step: "01",
     title: "Agent or dApp Requests Verification",
-    desc: "An AI agent (identified via ERC-8004) or dApp calls the KYH API with a wallet address and desired tier. No API keys needed — the wallet IS the identity.",
+    desc: "An AI agent (identified via ERC-8004) or dApp calls the KYH API with a wallet address and desired tier. No API keys needed. The wallet IS the identity.",
     icon: "🤖",
   },
   {
@@ -26,13 +26,13 @@ const howItWorks = [
   {
     step: "04",
     title: "Venice Decides Privately",
-    desc: "All verification signals are sent to Venice AI for holistic analysis. Venice reasons about cross-provider patterns, flags anomalies, and makes the final pass/fail decision — with zero data retention. Private cognition, not hard-coded rules.",
+    desc: "All verification signals go to Venice AI for holistic analysis. Venice reasons about cross-provider patterns, flags anomalies, and makes the final pass/fail decision. Zero data retention. Private cognition, not hard-coded rules.",
     icon: "🧠",
   },
   {
     step: "05",
     title: "EAS Attestation Issued on Celo",
-    desc: "KYH issues an EAS attestation to the human's wallet — valid for 90 days. Any agent or dApp reads it for free with a single contract call. Your identity follows you to Celo.",
+    desc: "KYH issues an EAS attestation to the human's wallet, valid for 90 days. Any agent or dApp reads it for free with a single contract call. Your identity follows you to Celo.",
     icon: "📜",
   },
 ];
@@ -54,12 +54,12 @@ const useCases = [
   {
     icon: "💸",
     title: "Cross-Border Remittance",
-    desc: "Agent sends cUSD internationally. Remittance dApp requires sender identity. KYH verifies once — all future transfers clear instantly.",
+    desc: "Agent sends cUSD internationally. Remittance dApp requires sender identity. KYH verifies once, all future transfers clear instantly.",
   },
   {
     icon: "🏦",
     title: "Micro-Lending",
-    desc: "Lending protocol needs proof of unique humanity before issuing a loan. Starter tier works without a passport — phone + social proof is enough.",
+    desc: "Lending protocol needs proof of unique humanity before issuing a loan. Reputation tier works without a passport. Onchain activity and social proof is enough.",
   },
   {
     icon: "🗳️",
@@ -98,30 +98,43 @@ export default function LandingPage() {
             <span className="badge badge-green text-xs">
               🏆 Celo Hackathon 2026
             </span>
-            <span className="badge badge-blue text-xs">
-              Testnet Live
+            <span className="badge badge-green text-xs">
+              Live on Celo
             </span>
+          </div>
+
+          {/* Logo */}
+          <div className="flex justify-center mb-8">
+            <img src="/logo.svg" alt="Know Your Human" className="w-20 h-20 sm:w-24 sm:h-24" />
           </div>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight tracking-tight">
             Know Your Human
             <br />
-            <span className="gradient-text">KYC for the Celo Ecosystem</span>
+            <span className="gradient-text">ZK Identity for the Celo Ecosystem</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto mb-4 leading-relaxed">
-            The first identity verification API built for AI agents and dApps on Celo.
-            Verify once. Credential lives on-chain for 90 days.{" "}
-            <strong className="text-white">Any agent reads the credential for free.</strong>
+            Identity verification for AI agents and dApps on Celo.
+            Zero-knowledge proofs. Private AI reasoning. On-chain credentials.
           </p>
+
+          {/* Verify Once callout - prominent, above the fold */}
+          <div className="rounded-2xl p-5 border border-[#35D07F]/30 bg-[#35D07F]/5 max-w-2xl mx-auto mb-8">
+            <p className="text-lg font-bold text-[#35D07F] mb-1">Verify Once. Read Forever.</p>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              One verification costs <strong className="text-white">free to $0.75</strong> depending on tier.
+              After that, the on-chain credential is <strong className="text-white">free for everyone</strong> to read.
+              Any agent, any dApp, any protocol. No recurring fees. No per-read charges. Ever.
+            </p>
+          </div>
+
           <p className="text-base text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Your identity follows you to Celo. Agents pay via{" "}
-            <strong className="text-white">x402</strong> in cUSD — no API keys, no sign-ups.
+            Agents pay per verification via{" "}
+            <strong className="text-white">x402</strong> in cUSD. No API keys, no sign-ups.
             Credentials issued as{" "}
             <strong className="text-white">EAS attestations</strong> on Celo.
-            Powered by <strong className="text-white">Venice AI</strong> for private cognition — verify the human, forget the data.
-            From <strong className="text-gray-300">free</strong> to{" "}
-            <strong className="text-gray-300">$0.75</strong> per verification.
+            Powered by <strong className="text-white">Venice AI</strong> for private cognition.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
@@ -144,7 +157,7 @@ export default function LandingPage() {
                   <code className="text-[#35D07F] bg-black/30 px-1.5 py-0.5 rounded text-xs">
                     GET /api/check/0xABC...
                   </code>
-                  {" "}— free, no auth. Download the{" "}
+                  {" "}Free, no auth. Download the{" "}
                   <a href="/skill.md" className="text-[#35D07F] underline underline-offset-2 hover:text-white">
                     agent skill file
                   </a>
@@ -232,15 +245,7 @@ export default function LandingPage() {
             />
           </div>
 
-          {/* Verify once callout */}
-          <div className="mt-14 rounded-2xl p-8 border border-[#35D07F]/20 bg-[#35D07F]/5 max-w-3xl mx-auto text-center">
-            <p className="text-sm text-[#35D07F] font-semibold mb-1">✨ Verify Once. Read Forever.</p>
-            <p className="text-gray-300 text-sm leading-relaxed">
-              The first verification costs <strong className="text-white">$0.001–$0.75</strong> depending on tier.
-              After that, the EAS credential is free to read for any agent or dApp — forever.
-              No recurring fees. No subscriptions. <strong className="text-white">Pure public good.</strong>
-            </p>
-          </div>
+
         </div>
       </section>
 
@@ -292,7 +297,7 @@ export default function LandingPage() {
                 </h2>
                 <p className="text-gray-400 leading-relaxed mb-4">
                   Agents prove they&apos;re human-backed via{" "}
-                  <strong className="text-white">Self Agent ID</strong> — zero-knowledge proof
+                  <strong className="text-white">Self Agent ID</strong>, a zero-knowledge proof
                   that a real person operates the agent. dApps identify by wallet address.
                   Both pay via x402 in cUSD.
                 </p>
@@ -329,7 +334,7 @@ export default function LandingPage() {
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed">
               Venice is KYH&apos;s core reasoning engine. Every verification decision is made by Venice&apos;s
-              private inference — not hard-coded rules. Zero data retention means your identity is verified,
+              private inference, not hard-coded rules. Zero data retention means your identity is verified,
               never stored.
             </p>
           </div>
@@ -341,8 +346,8 @@ export default function LandingPage() {
                 <h3 className="text-lg font-bold text-white">Zero Data Retention</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Venice processes verification signals and returns a decision. Nothing is stored —
-                no logs, no training data, no records. The privacy guarantee is structural, not just a policy page.
+                Venice processes verification signals and returns a decision. Nothing is stored.
+                No logs, no training data, no records. The privacy guarantee is structural, not a policy page.
               </p>
             </div>
 
@@ -352,7 +357,7 @@ export default function LandingPage() {
                 <h3 className="text-lg font-bold text-white">Holistic Reasoning</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Venice analyzes ALL provider signals together — catching patterns that simple threshold logic can&apos;t.
+                Venice analyzes all provider signals together, catching patterns that simple threshold logic can&apos;t.
                 &ldquo;Liveness passed but wallet is 2 hours old&rdquo; gets flagged. Cross-provider anomalies get caught.
               </p>
             </div>
@@ -363,7 +368,7 @@ export default function LandingPage() {
                 <h3 className="text-lg font-bold text-white">Private Cognition</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Direct Venice API — no middlemen, no aggregators. Your verification data never touches
+                Direct Venice API. No middlemen, no aggregators. Your verification data never touches
                 a third-party server. Venice sees anonymized signals, decides, and forgets.
               </p>
             </div>
@@ -374,7 +379,7 @@ export default function LandingPage() {
                 <h3 className="text-lg font-bold text-white">Deterministic Fallback</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                If Venice is unreachable, KYH falls back to deterministic scoring — clearly labeled as
+                If Venice is unreachable, KYH falls back to deterministic scoring, clearly labeled as
                 &ldquo;FALLBACK&rdquo; in the response. No silent degradation. The agent always knows who decided.
               </p>
             </div>
@@ -444,8 +449,8 @@ export default function LandingPage() {
               identity verification becomes critical infrastructure.
             </p>
             <p className="text-gray-400 mb-8 max-w-xl mx-auto text-sm leading-relaxed">
-              Know Your Human makes it seamless — one API, four tiers, credentials
-              that travel with your wallet for 90 days. Agents pay. Humans verify once. Everyone benefits.
+              One API. Four tiers. Credentials that travel with your wallet for 90 days.
+              Agents pay. Humans verify once. Everyone reads for free.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/demo" className="btn-primary text-base px-6 py-3">

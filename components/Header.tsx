@@ -19,9 +19,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#35D07F] to-[#2db86e] flex items-center justify-center font-black text-[#0a0a0a] text-sm">
-              K
-            </div>
+            <img src="/logo.svg" alt="KYH" className="w-8 h-8" />
             <span className="font-bold text-white text-lg hidden sm:block">
               Know Your<span className="text-[#35D07F]">Human</span>
             </span>

@@ -14,7 +14,7 @@ const tierConfig = {
     borderColor: "border-purple-500/30",
     bgColor: "bg-purple-500/5",
     badgeColor: "badge-blue",
-    description: "Onchain activity scoring — basic sybil resistance",
+    description: "Onchain activity scoring, basic sybil resistance",
     validity: "90-day credential",
     providers: "Human Passport",
   },
@@ -87,7 +87,7 @@ export default function VerificationCard({
         </div>
         <div className="text-right">
           <div className="text-2xl font-black text-white">{price}</div>
-          <div className="text-xs text-gray-500">cUSD per check</div>
+          <div className="text-xs text-gray-500">{price === "Free" ? "no gas required" : "cUSD per check"}</div>
         </div>
       </div>
 
