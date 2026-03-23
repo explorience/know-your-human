@@ -17,6 +17,7 @@
     "@celo/identity": "^5.1.2",
     "@selfxyz/agent-sdk": "^0.2.1",
     "@selfxyz/core": "^1.2.0-beta.1",
+    "@selfxyz/qrcode": "^1.0.22",
     "@tailwindcss/postcss": "^4.2.1",
     "autoprefixer": "^10.4.27",
     "next": "^16.1.6",

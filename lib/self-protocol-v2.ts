@@ -2,12 +2,18 @@
  * Self Protocol v2 Integration
  *
  * Self Protocol provides ZK-SNARK based passport/ID verification via NFC.
- * This module wraps @selfxyz/core with graceful fallback to demo mode
- * when SELF_APP_ID is not configured.
+ * Flow:
+ * 1. Frontend displays QR code (via SelfAppBuilder)
+ * 2. User scans with Self app on phone
+ * 3. User taps NFC passport
+ * 4. Self app generates ZK proof locally
+ * 5. Proof sent to our callback endpoint
+ * 6. Backend verifies proof via SelfBackendVerifier
  *
- * In production: real ZK proof verification
- * In demo mode: simulated verification flow for hackathon demos
+ * No API keys needed. No registration. Just scope + endpoint.
  */
+
+import { SelfBackendVerifier } from "@selfxyz/core";
 
 export interface SelfVerificationConfig {
   appId: string;
@@ -37,125 +43,84 @@ export interface VerificationSession {
   expiresAt: string;
 }
 
-// Check if Self Protocol is configured
+const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || "https://knowyourhuman.xyz";
+const SELF_SCOPE = "kyh-gateway";
+const SELF_APP_NAME = "Know Your Human";
+
 export function isSelfConfigured(): boolean {
-  return !!process.env.SELF_APP_ID;
+  // Self doesn't need API keys - always configured
+  return true;
 }
 
 /**
  * Create a verification session.
- * Returns a session with QR code data for the user to scan.
- * Falls back to demo mode if SELF_APP_ID is not set.
+ * Returns session with a verification URL that renders a QR code.
+ * User scans QR with Self app, taps passport NFC, proof comes back.
  */
 export async function createVerificationSession(
   userId: string,
   level: string
 ): Promise<VerificationSession> {
   const sessionId = generateSessionId();
-  const isDemoMode = !isSelfConfigured();
-  const appId = process.env.SELF_APP_ID || "demo-app-id";
-  const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || "http://localhost:3000";
-
   const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+  
+  // The endpoint where Self app will POST the proof
+  const callbackEndpoint = `${GATEWAY_URL}/api/verification/${sessionId}/callback`;
+  
+  // Build the Self app config for the QR code
+  // This will be consumed by the frontend SelfQRcodeWrapper component
+  const qrConfig = JSON.stringify({
+    version: 2,
+    appName: SELF_APP_NAME,
+    scope: SELF_SCOPE,
+    endpoint: callbackEndpoint,
+    endpointType: "https",
+    userId: userId,
+    sessionId: sessionId,
+    level: level,
+    disclosures: getDisclosuresForLevel(level),
+  });
 
-  if (isDemoMode) {
-    // Demo mode: generate simulated QR data
-    const qrData = JSON.stringify({
-      appId: "DEMO-KYC-GATEWAY",
-      sessionId,
-      userId,
-      level,
-      callbackUrl: `${gatewayUrl}/api/verification/${sessionId}/callback`,
-      demo: true,
-    });
-
-    return {
-      sessionId,
-      appId,
-      userId,
-      verificationUrl: `${gatewayUrl}/verify/${sessionId}`,
-      qrData,
-      status: "pending",
-      createdAt: new Date().toISOString(),
-      expiresAt,
-    };
-  }
-
-  // Real Self Protocol integration
-  try {
-    // Import Self Protocol SDK dynamically to avoid SSR issues
-    const { SelfBackendVerifier } = await import("@selfxyz/core");
-
-    const scopes = getScopesForLevel(level);
-
-    // In production: create session with Self Protocol API
-    // The QR code data is the deeplink/universal link for the Self app
-    const selfAppLink = `https://app.self.xyz/verify?appId=${appId}&sessionId=${sessionId}&scope=${scopes.join(",")}`;
-
-    return {
-      sessionId,
-      appId,
-      userId,
-      verificationUrl: `${gatewayUrl}/verify/${sessionId}`,
-      qrData: selfAppLink,
-      status: "pending",
-      createdAt: new Date().toISOString(),
-      expiresAt,
-    };
-  } catch {
-    // Fallback to demo if SDK not available
-    console.warn("Self Protocol SDK unavailable, using demo mode");
-    return createVerificationSession(userId, level);
-  }
+  return {
+    sessionId,
+    appId: SELF_APP_NAME,
+    userId,
+    verificationUrl: `${GATEWAY_URL}/verify/${sessionId}`,
+    qrData: qrConfig,
+    status: "pending",
+    createdAt: new Date().toISOString(),
+    expiresAt,
+  };
 }
 
 /**
  * Verify a Self Protocol proof on the backend.
- * Used in the webhook callback endpoint.
+ * Called when the Self app POSTs a proof to our callback endpoint.
  */
 export async function verifyProof(
   proof: string,
   publicSignals: string[],
   sessionId: string
 ): Promise<SelfVerificationResult> {
-  const isDemoMode = !isSelfConfigured();
-
-  if (isDemoMode) {
-    // Demo: simulate successful verification
-    await sleep(500); // Realistic delay
-    return {
-      isVerified: true,
-      nationality: "US",
-      isAdult: true,
-      isHuman: true,
-      proof: "0x" + "a".repeat(64),
-      nullifier: "0x" + "b".repeat(64),
-      demoMode: true,
-    };
-  }
-
+  const callbackEndpoint = `${GATEWAY_URL}/api/verification/${sessionId}/callback`;
+  
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const selfCore = await import("@selfxyz/core") as any;
-    const SelfBackendVerifier = selfCore.SelfBackendVerifier;
+    // Create verifier with production settings (mockPassport=false for mainnet)
+    const verifier = new SelfBackendVerifier(
+      SELF_SCOPE,
+      callbackEndpoint,
+      false, // mockPassport: false = mainnet verification
+    );
 
-    const appId = process.env.SELF_APP_ID!;
-    const scope = "kyc-gateway";
-    const callbackUrl = `${process.env.NEXT_PUBLIC_GATEWAY_URL || "http://localhost:3000"}/api/verification/${sessionId}/callback`;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const verifier = new SelfBackendVerifier(appId, callbackUrl, scope, false, {}, {}) as any;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await verifier.verify(proof, publicSignals) as any;
+    const result = await verifier.verify(proof, publicSignals) as Record<string, unknown>;
 
     return {
-      isVerified: result.isVerified,
-      nationality: result.nationality,
-      isAdult: result.isAdult,
-      isHuman: result.isHuman,
+      isVerified: result.isVerified as boolean,
+      nationality: result.nationality as string | undefined,
+      isAdult: result.isAdult as boolean | undefined,
+      isHuman: result.isHuman as boolean | undefined,
       proof,
-      nullifier: result.nullifier,
+      nullifier: result.nullifier as string | undefined,
       demoMode: false,
     };
   } catch (error) {
@@ -165,53 +130,60 @@ export async function verifyProof(
 }
 
 /**
- * Simulate a demo verification completion.
- * In production, this is triggered by the Self Protocol webhook.
+ * Get disclosures for a verification level.
+ * These control what the user reveals from their passport.
  */
-export async function simulateDemoVerification(
-  sessionId: string
-): Promise<SelfVerificationResult> {
-  await sleep(2000); // Simulate processing time
-
-  return {
-    isVerified: true,
-    nationality: "CA",
-    isAdult: true,
-    isHuman: true,
-    proof: "0x" + randomHex(64),
-    nullifier: "0x" + randomHex(64),
-    demoMode: true,
+function getDisclosuresForLevel(level: string): Record<string, unknown> {
+  const base = {
+    // Always request proof of valid passport (humanity proof)
+    issuing_state: false,     // don't require specific country
+    name: false,              // don't reveal name
+    nationality: true,        // reveal nationality (for claims)
+    date_of_birth: false,     // don't reveal exact DOB
+    gender: false,
+    expiry_date: false,
   };
+
+  switch (level) {
+    case "reputation":
+    case "basic":
+      return {
+        ...base,
+        nationality: false,   // minimal disclosure for basic
+        minimumAge: 18,       // just verify 18+
+      };
+    case "document":
+    case "standard":
+      return {
+        ...base,
+        minimumAge: 18,
+      };
+    case "biometric":
+      return {
+        ...base,
+        minimumAge: 18,
+      };
+    case "fullkyc":
+    case "enhanced":
+      return {
+        ...base,
+        nationality: true,    // need nationality for KYC
+        minimumAge: 18,
+        // ofac check is built into Self's ZK circuit
+      };
+    default:
+      return {
+        ...base,
+        minimumAge: 18,
+      };
+  }
 }
 
 // Helper functions
-
-function getScopesForLevel(level: string): string[] {
-  switch (level) {
-    case "basic":
-      return ["humanity_proof"];
-    case "standard":
-      return ["humanity_proof", "nationality", "age_18_plus"];
-    case "enhanced":
-      return ["humanity_proof", "nationality", "age_18_plus", "not_sanctioned"];
-    default:
-      return ["humanity_proof"];
-  }
-}
 
 function generateSessionId(): string {
   return (
     Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15)
   );
-}
-
-function randomHex(length: number): string {
-  return Array.from({ length }, () =>
-    Math.floor(Math.random() * 16).toString(16)
-  ).join("");
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }

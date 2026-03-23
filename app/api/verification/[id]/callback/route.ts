@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verificationRequests } from "@/app/api/verification/route";
-import { verifyProof, simulateDemoVerification } from "@/lib/self-protocol-v2";
-import { registerAttestation } from "@/lib/self-protocol";
-import type { Address } from "viem";
+import { verifyProof } from "@/lib/self-protocol-v2";
 
 /**
  * POST /api/verification/[id]/callback
  *
- * Webhook endpoint called by Self Protocol after user completes verification.
- * Also handles demo mode simulation.
+ * Webhook endpoint called by Self Protocol app after user completes verification.
+ * Self app POSTs the ZK proof + public signals here.
  */
 export async function POST(
   request: NextRequest,
@@ -33,23 +31,17 @@ export async function POST(
     }
 
     const body = await request.json().catch(() => ({}));
-    const { proof, publicSignals, demo } = body;
+    const { proof, publicSignals } = body;
 
-    let verificationResult;
-
-    if (demo || !process.env.SELF_APP_ID) {
-      // Demo mode simulation
-      verificationResult = await simulateDemoVerification(id);
-    } else {
-      // Real Self Protocol proof verification
-      if (!proof || !publicSignals) {
-        return NextResponse.json(
-          { error: "proof and publicSignals are required" },
-          { status: 400 }
-        );
-      }
-      verificationResult = await verifyProof(proof, publicSignals, id);
+    if (!proof || !publicSignals) {
+      return NextResponse.json(
+        { error: "proof and publicSignals are required" },
+        { status: 400 }
+      );
     }
+
+    // Verify the ZK proof using Self's backend verifier
+    const verificationResult = await verifyProof(proof, publicSignals, id);
 
     if (!verificationResult.isVerified) {
       requestData.status = "failed";
@@ -59,29 +51,10 @@ export async function POST(
       );
     }
 
-    // Register on-chain attestation
-    const hasIssuerKey = process.env.ISSUER_PRIVATE_KEY;
-    if (hasIssuerKey) {
-      try {
-        const result = await registerAttestation(
-          `+1555${requestData.userAddress.slice(-7)}`,
-          requestData.userAddress as Address
-        );
-        requestData.status = "completed";
-        requestData.attestationHash = result.transactionHash;
-      } catch (error) {
-        console.error("On-chain attestation failed:", error);
-        // Still mark as completed with demo hash
-        requestData.status = "completed";
-        requestData.attestationHash =
-          "0x" + Math.random().toString(16).slice(2, 66);
-      }
-    } else {
-      // Demo mode attestation hash
-      requestData.status = "completed";
-      requestData.attestationHash =
-        "0x" + Math.random().toString(16).slice(2, 66);
-    }
+    // Mark as completed
+    requestData.status = "completed";
+    requestData.attestationHash =
+      "0x" + Buffer.from(proof.slice(0, 32)).toString("hex").padEnd(64, "0");
 
     return NextResponse.json({
       success: true,
@@ -91,10 +64,10 @@ export async function POST(
       nationality: verificationResult.nationality,
       isAdult: verificationResult.isAdult,
       isHuman: verificationResult.isHuman,
-      demoMode: verificationResult.demoMode,
+      demoMode: false,
     });
   } catch (error) {
-    console.error("Callback error:", error);
+    console.error("Self Protocol callback error:", error);
     return NextResponse.json(
       { error: "Callback processing failed" },
       { status: 500 }
