@@ -20,7 +20,7 @@ const howItWorks = [
   {
     step: "03",
     title: "Human Verifies Once",
-    desc: "The human receives a verification link. Depending on tier: scan passport NFC via Self Protocol, complete a liveness check via Didit, or confirm social presence via Human Passport. Takes 5–120 seconds.",
+    desc: "The human receives a verification link. Depending on tier: check onchain activity (Reputation), scan passport NFC via Self Protocol (Document), or complete liveness + face match via Didit (Biometric/Full KYC). Takes 5–120 seconds.",
     icon: "📱",
   },
   {
@@ -111,7 +111,7 @@ export default function LandingPage() {
             <strong className="text-white">x402</strong> in cUSD — no API keys, no sign-ups.
             Credentials issued as{" "}
             <strong className="text-white">EAS attestations</strong> on Celo.
-            From <strong className="text-gray-300">$0.001</strong> to{" "}
+            From <strong className="text-gray-300">free</strong> to{" "}
             <strong className="text-gray-300">$0.75</strong> per verification. Zero PII stored.
           </p>
 
@@ -143,56 +143,56 @@ export default function LandingPage() {
             </h2>
             <p className="text-gray-400 max-w-lg mx-auto leading-relaxed">
               Pay per verification in cUSD on Celo. No subscriptions, no minimums.
-              Agents pay automatically via x402. All credentials valid for 90 days.
+              Reputation tier is free. Agents with Self Agent ID get 20% off.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
             <VerificationCard
-              tier="starter"
-              price="$0.001"
+              tier="reputation"
+              price="Free"
               features={[
-                "No passport required",
-                "Phone number uniqueness",
-                "Social presence proof",
-                "Built for the unbanked",
+                "Onchain activity scoring",
+                "Social presence analysis",
+                "Basic sybil resistance",
+                "No documents required",
                 "EAS credential on Celo",
                 "90-day validity",
               ]}
             />
             <VerificationCard
-              tier="basic"
+              tier="document"
               price="$0.01"
               features={[
                 "NFC passport chip scan",
-                "ZK-SNARK proof",
-                "Humanity + age verified",
+                "ZK-SNARK proof generated",
+                "Age + nationality derived",
                 "No biometrics needed",
                 "EAS credential on Celo",
                 "90-day validity",
               ]}
             />
             <VerificationCard
-              tier="standard"
+              tier="biometric"
               price="$0.25"
               features={[
                 "Gov ID document scan",
-                "Liveness check",
+                "Liveness detection",
                 "Face match verification",
-                "ZK proof — no PII stored",
+                "IP analysis (VPN/proxy check)",
                 "EAS credential on Celo",
                 "90-day validity",
               ]}
               highlighted={true}
             />
             <VerificationCard
-              tier="enhanced"
+              tier="fullkyc"
               price="$0.75"
               features={[
-                "ZK passport + biometrics",
-                "Full AML screening",
-                "Sanctions list check",
-                "Multi-provider assurance",
+                "ZK passport proof (Self)",
+                "Biometric liveness (Didit)",
+                "AML/sanctions screening",
+                "IP analysis included",
                 "EAS credential on Celo",
                 "90-day validity",
               ]}
@@ -258,20 +258,27 @@ export default function LandingPage() {
                   Built for the <span className="gradient-text">Agentic Web</span>
                 </h2>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Agents identify themselves via{" "}
-                  <strong className="text-white">ERC-8004</strong> — the on-chain agent registry.
-                  dApps use their wallet address. Both pay via x402 in cUSD. Both get the same result.
+                  Agents prove they&apos;re human-backed via{" "}
+                  <strong className="text-white">Self Agent ID</strong> — zero-knowledge proof
+                  that a real person operates the agent. dApps identify by wallet address.
+                  Both pay via x402 in cUSD.
                 </p>
                 <p className="text-gray-400 leading-relaxed mb-4">
                   No API keys. No sign-ups. No dashboards. The wallet IS the identity.
-                  If your wallet has an ERC-8004 registration, KYH shows your agent name and metadata.
-                  If not, you&apos;re just an address — and that&apos;s fine too.
                 </p>
-                <div className="flex items-center gap-3 mt-6 p-3 rounded-xl bg-[#35D07F]/5 border border-[#35D07F]/20">
-                  <span className="text-sm">⛓️</span>
-                  <span className="text-sm text-gray-300">
-                    KYH is registered as <strong className="text-[#35D07F]">ERC-8004 Agent #24212</strong> on Base
-                  </span>
+                <div className="flex flex-col gap-3 mt-6">
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-[#35D07F]/5 border border-[#35D07F]/20">
+                    <span className="text-sm">⛓️</span>
+                    <span className="text-sm text-gray-300">
+                      KYH is registered as <strong className="text-[#35D07F]">ERC-8004 Agent #24212</strong> on Base
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-[#FCFF52]/5 border border-[#FCFF52]/20">
+                    <span className="text-sm">💰</span>
+                    <span className="text-sm text-gray-300">
+                      Agents with <strong className="text-[#FCFF52]">Self Agent ID</strong> get 20% off all verification fees
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

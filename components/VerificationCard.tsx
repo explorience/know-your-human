@@ -1,5 +1,5 @@
 interface VerificationCardProps {
-  tier: "starter" | "basic" | "standard" | "enhanced";
+  tier: "reputation" | "document" | "biometric" | "fullkyc";
   price: string;
   features: string[];
   highlighted?: boolean;
@@ -7,19 +7,19 @@ interface VerificationCardProps {
 }
 
 const tierConfig = {
-  starter: {
-    name: "Starter",
-    icon: "📱",
+  reputation: {
+    name: "Reputation",
+    icon: "📊",
     color: "text-purple-400",
     borderColor: "border-purple-500/30",
     bgColor: "bg-purple-500/5",
     badgeColor: "badge-blue",
-    description: "Phone + social proof — no documents",
+    description: "Onchain activity scoring — basic sybil resistance",
     validity: "90-day credential",
-    providers: "Phone · Social Stamps",
+    providers: "Human Passport",
   },
-  basic: {
-    name: "Basic",
+  document: {
+    name: "Document",
     icon: "🔐",
     color: "text-blue-400",
     borderColor: "border-blue-500/30",
@@ -29,27 +29,27 @@ const tierConfig = {
     validity: "90-day credential",
     providers: "Self Protocol",
   },
-  standard: {
-    name: "Standard",
+  biometric: {
+    name: "Biometric",
     icon: "🪪",
     color: "text-[#35D07F]",
     borderColor: "border-[#35D07F]/30",
     bgColor: "bg-[#35D07F]/5",
     badgeColor: "badge-green",
-    description: "Gov ID + liveness via ZK proofs",
+    description: "Liveness + face match + gov ID via Didit",
     validity: "90-day credential",
-    providers: "Human Passport",
+    providers: "Didit",
   },
-  enhanced: {
-    name: "Enhanced",
+  fullkyc: {
+    name: "Full KYC",
     icon: "🛡️",
     color: "text-[#FCFF52]",
     borderColor: "border-[#FCFF52]/30",
     bgColor: "bg-[#FCFF52]/5",
     badgeColor: "badge-yellow",
-    description: "ZK passport + biometric KYC + AML",
+    description: "ZK passport + biometric + AML screening",
     validity: "90-day credential",
-    providers: "Self · Didit · Human Passport",
+    providers: "Self · Didit",
   },
 };
 
