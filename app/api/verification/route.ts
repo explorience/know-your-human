@@ -355,6 +355,7 @@ export async function POST(request: NextRequest) {
         })),
       },
       demoMode,
+      _debug: { easConfigured: isEASConfigured(), skipOnChain: multiProviderResult.demoMode },
       selfAgentId: hasAgentId
         ? {
             verified: true,
