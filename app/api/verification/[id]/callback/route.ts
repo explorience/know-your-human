@@ -59,16 +59,23 @@ export async function POST(
     }
 
     // Step 2: Run Venice AI reasoning on the Self Protocol signals
+    const selfChecks: Array<{ type: "humanity" | "age" | "nationality"; passed: boolean; details: string; confidence: number }> = [
+      { type: "humanity", passed: true, details: "Self Protocol NFC passport ZK proof verified", confidence: 99 },
+    ];
+    if (verificationResult.isAdult) {
+      selfChecks.push({ type: "age", passed: true, details: "User is 18+", confidence: 99 });
+    }
+    if (verificationResult.nationality) {
+      selfChecks.push({ type: "nationality", passed: true, details: `Nationality: ${verificationResult.nationality}`, confidence: 99 });
+    }
+
     const selfSignals = {
-      provider: "self",
+      provider: "self" as const,
       success: true,
-      checks: [
-        { type: "humanity", passed: true, details: "Self Protocol NFC passport ZK proof verified", confidence: 99 },
-        ...(verificationResult.isAdult ? [{ type: "age", passed: true, details: "User is 18+", confidence: 99 }] : []),
-        ...(verificationResult.nationality ? [{ type: "nationality", passed: true, details: `Nationality: ${verificationResult.nationality}`, confidence: 99 }] : []),
-      ],
+      checks: selfChecks,
       score: 99,
       demoMode: false,
+      durationMs: 0,
     };
 
     let veniceVerdict = null;
