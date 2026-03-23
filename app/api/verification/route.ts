@@ -269,8 +269,8 @@ export async function POST(request: NextRequest) {
       .join("+");
 
     // Only skip on-chain attestation if providers are in demo mode
-    // Failed verification still gets a real (failed) attestation if we're not in demo
-    const skipOnChain = multiProviderResult.demoMode || !multiProviderResult.overallSuccess;
+    const skipOnChain = multiProviderResult.demoMode;
+    console.log(`EAS: skipOnChain=${skipOnChain} overallSuccess=${multiProviderResult.overallSuccess} demoMode=${multiProviderResult.demoMode}`);
     const easAttestation = await issueKYHCredential(
       resolvedUser,
       level as TierLevel,
