@@ -130,11 +130,18 @@ export async function issueKYHCredential(
     const eas = new EAS(easAddress);
     eas.connect(signer);
 
-    const schemaEncoder = new SchemaEncoder("uint8 level,string provider,bool demoMode");
+    const schemaEncoder = new SchemaEncoder("bytes32 credentialType,uint8 assuranceLevel,bytes32 verificationMethod,bytes32 evidenceRef");
+
+    // Encode fields as bytes32
+    const credentialTypeBytes = ethers.encodeBytes32String("kyh-credential");
+    const verificationMethodBytes = ethers.encodeBytes32String(provider.slice(0, 31));
+    const evidenceRefBytes = ethers.encodeBytes32String("ipfs"); // TODO: actual evidence hash
+
     const encodedData = schemaEncoder.encodeData([
-      { name: "level", value: levelNum, type: "uint8" },
-      { name: "provider", value: provider, type: "string" },
-      { name: "demoMode", value: false, type: "bool" },
+      { name: "credentialType", value: credentialTypeBytes, type: "bytes32" },
+      { name: "assuranceLevel", value: levelNum, type: "uint8" },
+      { name: "verificationMethod", value: verificationMethodBytes, type: "bytes32" },
+      { name: "evidenceRef", value: evidenceRefBytes, type: "bytes32" },
     ]);
 
     const tx = await eas.attest({
