@@ -63,6 +63,7 @@ export interface KYHAttestation {
   demoMode: boolean;
   transactionHash: string;
   network: string;
+  easError?: string;
 }
 
 export function isEASConfigured(): boolean {
@@ -169,7 +170,8 @@ export async function issueKYHCredential(
       network,
     };
   } catch (error) {
-    console.error("EAS attestation failed, falling back to demo mode:", error);
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error("EAS attestation failed, falling back to demo mode:", errMsg);
     return {
       uid: generateDemoUID(),
       recipient: recipientAddress,
@@ -177,6 +179,7 @@ export async function issueKYHCredential(
       levelNum,
       provider,
       expiresAt,
+      easError: errMsg,
       issuedAt: now,
       demoMode: true,
       transactionHash: "0xdemo-fallback" + Math.random().toString(16).slice(2, 8),
