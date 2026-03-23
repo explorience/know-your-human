@@ -44,6 +44,7 @@ export const verificationRequests = new Map<
     attestationHash?: string;
     evidenceHash?: string;
     selfSessionId?: string;
+    selfQrData?: string;
     paymentTxHash?: string;
     providerResults?: MultiProviderResult;
     createdAt: string;
@@ -255,6 +256,7 @@ export async function POST(request: NextRequest) {
     // Store the Self session ID for webhook callbacks
     const storedRequest = verificationRequests.get(verificationId)!;
     storedRequest.selfSessionId = selfSession.sessionId;
+    storedRequest.selfQrData = selfSession.qrData;
 
     // For document/biometric/fullkyc tiers: Self Protocol NFC scan is required.
     // Return pending status with QR data — the callback endpoint will complete verification

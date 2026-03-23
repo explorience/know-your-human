@@ -188,6 +188,7 @@ export async function GET(
     level: requestData.level,
     attestationHash: requestData.attestationHash,
     evidenceHash: requestData.evidenceHash,
+    selfQrData: requestData.selfQrData,
     createdAt: requestData.createdAt,
     expiresAt: requestData.expiresAt,
   });
