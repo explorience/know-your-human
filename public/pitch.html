@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Know Your Human - Pitch</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0a; color: #e0e0e0; }
+
+  .slide {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 80px;
+    border-bottom: 1px solid #222;
+    position: relative;
+  }
+
+  .slide-number {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    font-size: 14px;
+    color: #555;
+    font-family: monospace;
+  }
+
+  h1 { font-size: 3.5rem; font-weight: 700; line-height: 1.1; margin-bottom: 24px; }
+  h2 { font-size: 2.4rem; font-weight: 600; line-height: 1.2; margin-bottom: 20px; }
+  h3 { font-size: 1.6rem; font-weight: 500; margin-bottom: 16px; color: #aaa; }
+  p { font-size: 1.3rem; line-height: 1.6; color: #bbb; max-width: 800px; }
+  .subtitle { font-size: 1.5rem; color: #888; margin-bottom: 40px; }
+
+  .accent { color: #FCFF52; }
+  .green { color: #35D07F; }
+  .blue { color: #6366f1; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; margin-top: 30px; }
+
+  .card {
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 32px;
+  }
+  .card h3 { color: #e0e0e0; font-size: 1.3rem; margin-bottom: 12px; }
+  .card p { font-size: 1.1rem; }
+
+  .stat { font-size: 3rem; font-weight: 700; margin-bottom: 8px; }
+
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  .flow-num {
+    background: #FCFF52;
+    color: #000;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .flow-text h3 { margin-bottom: 4px; color: #e0e0e0; font-size: 1.2rem; }
+  .flow-text p { font-size: 1rem; }
+
+  .tier-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 100px;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid #222;
+    align-items: center;
+  }
+  .tier-name { font-weight: 600; font-size: 1.2rem; }
+  .tier-price { text-align: right; font-family: monospace; font-size: 1.1rem; }
+
+  .tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .tech-tag {
+    background: #1a1a2e;
+    border: 1px solid #333;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+  }
+
+  .logo-row {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+  }
+  .logo-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-item img { height: 48px; }
+  .logo-item span { font-size: 0.85rem; color: #888; }
+
+  .cta-box {
+    background: linear-gradient(135deg, #1a1a2e 0%, #0f2027 100%);
+    border: 1px solid #35D07F;
+    border-radius: 16px;
+    padding: 40px;
+    margin-top: 30px;
+    text-align: center;
+  }
+  .cta-box a {
+    color: #FCFF52;
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+  .cta-box a:hover { text-decoration: underline; }
+
+  ul { list-style: none; margin-top: 16px; }
+  ul li { padding: 8px 0; font-size: 1.15rem; color: #bbb; }
+  ul li::before { content: "->"; color: #FCFF52; margin-right: 10px; font-family: monospace; }
+
+  .small { font-size: 0.9rem; color: #666; margin-top: 12px; }
+
+  @media (max-width: 768px) {
+    .slide { padding: 40px 24px; }
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.6rem; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .tier-row { grid-template-columns: 1fr; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: Title -->
+<section class="slide">
+  <span class="slide-number">01</span>
+  <h3>Synthesis Hackathon 2025</h3>
+  <h1>Know Your Human</h1>
+  <p class="subtitle">Human identity verification for the Celo ecosystem.<br>Built for the agents and dApps that need to know who they're dealing with.</p>
+  <div style="margin-top: 40px;">
+    <p><span class="green">knowyourhuman.xyz</span> &middot; Live on Celo Mainnet</p>
+  </div>
+</section>
+
+<!-- SLIDE 2: Problem -->
+<section class="slide">
+  <span class="slide-number">02</span>
+  <h2>The Problem</h2>
+  <div class="grid-2">
+    <div>
+      <p style="font-size: 1.4rem; color: #e0e0e0; margin-bottom: 20px;">Agents can't tell humans from bots.</p>
+      <ul>
+        <li>Sybil attacks drain airdrops and governance</li>
+        <li>AI agents need to verify humans before acting on their behalf</li>
+        <li>dApps want KYC without building it themselves</li>
+        <li>No single provider covers everyone</li>
+      </ul>
+    </div>
+    <div class="card" style="display: flex; flex-direction: column; justify-content: center;">
+      <div class="stat accent">$1.5B+</div>
+      <p>Lost to sybil attacks in crypto airdrops and governance (estimated)</p>
+      <div class="stat green" style="margin-top: 24px;">174</div>
+      <p>Countries with NFC biometric passports (Self Protocol coverage)</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3: Solution -->
+<section class="slide">
+  <span class="slide-number">03</span>
+  <h2>The Solution</h2>
+  <p style="margin-bottom: 30px;">A multi-provider identity gateway with AI reasoning. One API call. Multiple verification providers. On-chain attestations.</p>
+
+  <div class="flow-step">
+    <div class="flow-num">1</div>
+    <div class="flow-text">
+      <h3>Agent sends verification request</h3>
+      <p>POST /api/verification with wallet address and desired tier</p>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-num">2</div>
+    <div class="flow-text">
+      <h3>Multi-provider verification runs</h3>
+      <p>Gitcoin Passport, Self Protocol (NFC passport), Didit (biometrics) - scored in parallel</p>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-num">3</div>
+    <div class="flow-text">
+      <h3>Venice AI makes the decision</h3>
+      <p>Zero-knowledge reasoning engine evaluates all provider signals holistically. No hard-coded rules. Zero data retention.</p>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-num">4</div>
+    <div class="flow-text">
+      <h3>EAS attestation issued on Celo</h3>
+      <p>Permanent, on-chain credential. Evidence pinned to IPFS. ENS names resolved. Verify once, read forever.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: Architecture -->
+<section class="slide">
+  <span class="slide-number">04</span>
+  <h2>Two-Layer Credential Design</h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3><span class="green">On-Chain Layer</span> (EAS on Celo)</h3>
+      <p>Lean and permanent. 4 fields:</p>
+      <ul>
+        <li>credentialType (bytes32)</li>
+        <li>assuranceLevel (uint8: 1-4)</li>
+        <li>verificationMethod (bytes32)</li>
+        <li>evidenceRef (bytes32)</li>
+      </ul>
+      <p class="small">Schema: 0x23b867f...daad5ab</p>
+    </div>
+    <div class="card">
+      <h3><span class="blue">Off-Chain Layer</span> (Evidence + Claims)</h3>
+      <p>Rich, structured, extensible:</p>
+      <ul>
+        <li>uniqueHuman, over18, livenessConfirmed</li>
+        <li>faceMatch, notSanctioned</li>
+        <li>Provider attribution per claim</li>
+        <li>Venice AI verdict with reasoning</li>
+        <li>Pinned to IPFS via Pinata</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top: 20px;">New claims added as JSON keys. No on-chain schema changes needed.</p>
+</section>
+
+<!-- SLIDE 5: Tiers -->
+<section class="slide">
+  <span class="slide-number">05</span>
+  <h2>Verification Tiers</h2>
+  <p style="margin-bottom: 20px;">Progressive trust levels. Pay only for what you need.</p>
+
+  <div class="tier-row">
+    <div class="tier-name"><span class="green">Reputation</span></div>
+    <div>Gitcoin Passport sybil score. On-chain history analysis.</div>
+    <div class="tier-price green">Free</div>
+  </div>
+  <div class="tier-row">
+    <div class="tier-name"><span class="accent">Document</span></div>
+    <div>NFC passport scan via Self Protocol. ZK proofs generated on-device. 174 countries.</div>
+    <div class="tier-price">0.01 cUSD</div>
+  </div>
+  <div class="tier-row">
+    <div class="tier-name"><span class="blue">Biometric</span></div>
+    <div>Liveness detection + face match + gov ID via Didit.</div>
+    <div class="tier-price">0.25 cUSD</div>
+  </div>
+  <div class="tier-row">
+    <div class="tier-name" style="color: #f59e0b;">Full KYC</div>
+    <div>Document + biometric + AML screening. Regulatory grade.</div>
+    <div class="tier-price">1.00 cUSD</div>
+  </div>
+
+  <p class="small" style="margin-top: 20px;">x402 payment protocol. Verified AI agents get 20% discount via Self Agent ID.</p>
+</section>
+
+<!-- SLIDE 6: Venice AI -->
+<section class="slide">
+  <span class="slide-number">06</span>
+  <h2>Venice AI: The Reasoning Engine</h2>
+  <p style="margin-bottom: 30px;">Not hard-coded rules. Not a simple threshold. An AI that understands context.</p>
+
+  <div class="grid-2">
+    <div>
+      <ul>
+        <li>Evaluates all provider signals holistically</li>
+        <li>Catches contradictions (high reputation + failed liveness = suspicious)</li>
+        <li>Returns confidence scores, flags, and human-readable reasoning</li>
+        <li>Handles edge cases that if/else logic can't</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color: #6366f1;">
+      <h3>Privacy by Design</h3>
+      <div class="stat blue" style="font-size: 2rem;">Zero</div>
+      <p>data retention. Venice processes signals and immediately discards them. No PII stored. No training on verification data.</p>
+      <p class="small" style="margin-top: 12px;">Model: llama-3.3-70b via Venice AI direct API</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: Tech Stack -->
+<section class="slide">
+  <span class="slide-number">07</span>
+  <h2>Built With</h2>
+  <div class="grid-3">
+    <div class="card">
+      <h3><span class="green">Celo</span></h3>
+      <p>EAS attestations on mainnet. cUSD payments. Low gas costs make per-verification attestations economical.</p>
+    </div>
+    <div class="card">
+      <h3><span class="accent">Self Protocol</span></h3>
+      <p>NFC passport verification with ZK proofs. 174 countries. Data never leaves the user's device.</p>
+    </div>
+    <div class="card">
+      <h3><span class="blue">Venice AI</span></h3>
+      <p>Private LLM reasoning engine. Zero data retention. Makes holistic pass/fail decisions from provider signals.</p>
+    </div>
+    <div class="card">
+      <h3>Gitcoin Passport</h3>
+      <p>Sybil resistance scoring. 14+ stamp types. On-chain reputation analysis.</p>
+    </div>
+    <div class="card">
+      <h3>Didit</h3>
+      <p>Biometric verification. Liveness detection, face matching, government ID verification.</p>
+    </div>
+    <div class="card">
+      <h3>IPFS + ENS</h3>
+      <p>Evidence pinned to IPFS via Pinata. ENS names resolved for every wallet. Human-readable identities.</p>
+    </div>
+  </div>
+  <div class="tech-stack" style="margin-top: 30px;">
+    <span class="tech-tag">Next.js 15</span>
+    <span class="tech-tag">TypeScript</span>
+    <span class="tech-tag">EAS SDK</span>
+    <span class="tech-tag">x402 Protocol</span>
+    <span class="tech-tag">Self Agent ID</span>
+    <span class="tech-tag">Vercel</span>
+    <span class="tech-tag">Tailwind v4</span>
+  </div>
+</section>
+
+<!-- SLIDE 8: What We Built -->
+<section class="slide">
+  <span class="slide-number">08</span>
+  <h2>What We Built (in 48 hours)</h2>
+  <div class="grid-2">
+    <div>
+      <ul>
+        <li>Multi-provider verification API (live, tested)</li>
+        <li>Venice AI reasoning engine (real decisions, not stubs)</li>
+        <li>EAS attestations on Celo mainnet</li>
+        <li>Two-layer credential design (on-chain + off-chain claims)</li>
+        <li>IPFS evidence pinning via Pinata</li>
+        <li>ENS name resolution for all wallets</li>
+        <li>x402 payment protocol for paid tiers</li>
+        <li>Self Agent ID verification (20% discount)</li>
+        <li>Real Self Protocol NFC passport integration</li>
+        <li>Real Didit biometric sessions</li>
+        <li>Demo flow with credential check</li>
+        <li>Public skill.md for agent discovery</li>
+      </ul>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="stat green">5</div>
+        <p>API endpoints live on Celo mainnet</p>
+      </div>
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="stat accent">3</div>
+        <p>Identity providers integrated (HP, Self, Didit)</p>
+      </div>
+      <div class="card">
+        <div class="stat blue">1</div>
+        <p>AI reasoning engine (Venice) making real decisions</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 9: Roadmap -->
+<section class="slide">
+  <span class="slide-number">09</span>
+  <h2>What's Next</h2>
+  <div class="grid-2">
+    <div>
+      <h3 style="color: #e0e0e0;">Short Term</h3>
+      <ul>
+        <li>WorldID integration (another billion humans)</li>
+        <li>Redis-backed verification store</li>
+        <li>Frontend ENS display</li>
+        <li>On-chain sponsor economics (first-verifier incentives)</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="color: #e0e0e0;">Long Term</h3>
+      <ul>
+        <li>Smart contract oracle for on-chain claims queries</li>
+        <li>Cross-chain attestation bridging</li>
+        <li>Reputation decay and re-verification</li>
+        <li>Identity provider marketplace</li>
+        <li>Become the default identity layer for Celo agents</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 10: CTA -->
+<section class="slide">
+  <span class="slide-number">10</span>
+  <h2>Try It Now</h2>
+  <div class="cta-box">
+    <h2 style="color: #e0e0e0; margin-bottom: 16px;">Verify Once. Read Forever.</h2>
+    <p style="max-width: 600px; margin: 0 auto 24px;">
+      One API call. Multiple providers. AI-powered reasoning. On-chain attestations on Celo.
+    </p>
+    <a href="https://knowyourhuman.xyz">knowyourhuman.xyz</a>
+    <p style="margin-top: 16px; font-size: 1rem; color: #888;">
+      <a href="https://knowyourhuman.xyz/skill.md" style="color: #888; text-decoration: none;">skill.md</a> &middot;
+      <a href="https://github.com/explorience/know-your-human" style="color: #888; text-decoration: none;">GitHub</a> &middot;
+      <a href="https://knowyourhuman.xyz/demo" style="color: #888; text-decoration: none;">Demo</a>
+    </p>
+  </div>
+  <div style="margin-top: 40px; text-align: center;">
+    <p style="color: #555;">Built by Heenal Rajani &middot; heenal.eth &middot; Synthesis 2025</p>
+  </div>
+</section>
+
+</body>
+</html>
