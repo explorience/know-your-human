@@ -96,9 +96,6 @@ export default function LandingPage() {
         <div className="w-full max-w-4xl mx-auto text-center relative z-10">
           <div className="flex items-center justify-center gap-2 mb-6">
             <span className="badge badge-green text-xs">
-              🏆 Celo Hackathon 2026
-            </span>
-            <span className="badge badge-green text-xs">
               Live on Celo
             </span>
           </div>
@@ -110,13 +107,15 @@ export default function LandingPage() {
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight tracking-tight">
             Know Your Human
-            <br />
-            <span className="gradient-text">ZK Identity for the Celo Ecosystem</span>
           </h1>
-
           <p className="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto mb-4 leading-relaxed">
-            Identity verification for AI agents and dApps on Celo.
-            Zero-knowledge proofs. Private AI reasoning. On-chain credentials.
+            Human identity verification for AI agents
+          </p>
+
+          <p className="text-base text-gray-500 max-w-2xl mx-auto mb-6 leading-relaxed">
+            Sometimes an agent needs to know: is this a real person? Not a bot, not a sybil, not a scam wallet.
+            KYH verifies a human&apos;s identity in one API call and writes the credential on-chain.
+            Verify once — every future read is free.
           </p>
 
           {/* Verify Once callout - prominent, above the fold */}
@@ -130,11 +129,8 @@ export default function LandingPage() {
           </div>
 
           <p className="text-base text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Agents pay per verification via{" "}
-            <strong className="text-white">x402</strong> in cUSD. No API keys, no sign-ups.
-            Credentials issued as{" "}
-            <strong className="text-white">EAS attestations</strong> on Celo.
-            Powered by <strong className="text-white">Venice AI</strong> for private cognition.
+            No API keys. No sign-ups. Pay per verification in cUSD on Celo.
+            One call, one credential, reusable forever.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
